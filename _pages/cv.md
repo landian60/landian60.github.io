@@ -12,7 +12,7 @@ redirect_from:
 Education
 ======
 * B.S. in Nanjing, Hohai University, 2017-2021
-* M.S. in Shanghai, Tongji University(recommended for admission), 2021-2024(expected)
+* M.S. in Shanghai, Tongji University (recommended for admission), 2021-2024(expected)
 
 Work experience
 ======
@@ -42,7 +42,7 @@ Publications
     {% include archive-single-cv.html %}
   {% endfor %}</ul>
   
-Talks
+<!-- Talks
 ======
   <ul>{% for post in site.talks %}
     {% include archive-single-talk-cv.html %}
@@ -56,4 +56,4 @@ Teaching
   
 Service and leadership
 ======
-* Currently signed in to 43 different slack teams
+* Currently signed in to 43 different slack teams -->
