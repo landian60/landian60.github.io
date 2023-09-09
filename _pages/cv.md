@@ -11,8 +11,9 @@ redirect_from:
 
 Education
 ======
-* B.S. in Nanjing, Hohai University, 2017-2021
 * M.S. in Shanghai, Tongji University (recommended for admission), 2021-2024(expected)
+* B.S. in Nanjing, Hohai University, 2017-2021
+
 
 Work experience
 ======
