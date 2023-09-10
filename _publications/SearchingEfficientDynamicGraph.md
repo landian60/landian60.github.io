@@ -2,7 +2,7 @@
 title: "Searching Efficient Dynamic Graph CNN for Point Cloud Processing"
 collection: publications
 permalink: /publication/SearchingEfficientDynamicGraph
-excerpt: 'Panyue Chen, Rui Wang, Ping Zhao, Guanming Liu, et al.'
+excerpt: 'Panyue Chen, Rui Wang, Ping Zhao, **Guanming Liu**, et al.'
 date: 2022-10-01
 venue: 'AutoML'
 # paperurl: 'http://academicpages.github.io/files/paper3.pdf'

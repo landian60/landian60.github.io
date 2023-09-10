@@ -1,8 +1,8 @@
 ---
-title: "Training-free NAS for 3D Point Cloud Processing."
+title: "Training-free NAS for 3D Point Cloud Processing"
 collection: publications
 permalink: /publication/Training-freeNAS-3
-excerpt: 'Ping Zhao, Panyue Chen, Guanming Liu'
+excerpt: 'Ping Zhao, Panyue Chen, **Guanming Liu**'
 date: 2022-10-01
 venue: 'ACCV'
 # paperurl: 'http://academicpages.github.io/files/paper2.pdf'

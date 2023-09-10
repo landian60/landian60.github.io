@@ -1,8 +1,8 @@
 ---
-title: "Multimodal Knowledge Extraction and Accumulation Based on Hyperplane Embedding for Knowledge-based Visual Question Answering."
+title: "Multimodal Knowledge Extraction and Accumulation Based on Hyperplane Embedding for Knowledge-based Visual Question Answering"
 collection: publications
 permalink: /publication/MultimodalKnowledgeExtraction-2
-excerpt: 'Heng Zhang, Zhihua Wei, Guanming Liu, et al'
+excerpt: 'Heng Zhang, Zhihua Wei, **Guanming Liu**, et al'
 date: 2023-10-01
 venue: 'CGI'
 # paperurl: 'http://academicpages.github.io/files/paper1.pdf'
