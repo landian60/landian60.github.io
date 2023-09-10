@@ -14,4 +14,4 @@ News
 ======
 * Now I am a research intern focusing text-to-image generation on Ele.me, Alibaba Group.
 
-* The paper "Extending Implicit Neural Representations fro Text-to-Image Generation" is under submission.
+* The paper "Extending Implicit Neural Representations for Text-to-Image Generation" is under submission.
