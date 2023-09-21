@@ -1,5 +1,5 @@
 ---
-title: "Extending Implicit Neural Representations for Text-to-Image Generation"
+title: "Text-guided Implicit Neural Representations For Continuous Image Generation"
 collection: publications
 permalink: /publication/ExtendingImplicitNeuralRepresentations-1
 excerpt: '**Guanming Liu**, Zhihua Wei, et al'
