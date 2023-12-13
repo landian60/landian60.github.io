@@ -8,10 +8,11 @@ redirect_from:
   - /about.html
 ---
 
-Greetings! My name is Guanming Liu, a third-year master's student from **Tongji University**, majoring in computer science and technology. My research interests lie in **multi-modal image generation** and **implicit neural representation**, especially on **GAN/Diffusion models**. 
+Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests lie in **multi-modal image generation** and **implicit neural representation**, especially on **GAN/Diffusion models**. 
 
 News
 ======
-* Now I am a research intern focusing text-to-image generation on Ele.me, Alibaba Group.
 
-* The paper "Text-guided Implicit Neural Representations For Continuous Image Generation" is under submission.
+* The paper "Extending Implicit Neural Representations for Text-to-Image Generation" is accepted by ICASSP 2024.
+* I am exploring an image evaluation metric based on multi-modal contrastive models like CLIP and signal frequency analysis to calculate the topology discrepancies.
+* Ramping up for my next TOEFL bout! 🚀📚💪

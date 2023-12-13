@@ -17,7 +17,7 @@ Education
 
 Work experience
 ======
-* September 2022 - Present: Research Intern
+* September 2022 - September 2023: Research Intern
   * Ele.me, Alibaba Group
   * Study on text-image generation
 
@@ -30,12 +30,14 @@ Work experience
   * Robotics Motion and Vision Laboratory, Hohai University
   * Study on Visual SLAM and object detection
 
-Technical Skills
+Technical Skills & Others
 ======
 * Programming Languages 
   * Python, C++, Java, JavaScript, MATLAB, Latex, SQL
 * Frameworks and Platforms
   * Git, PyTorch, Linux, Flask, Unity 3D
+* Hobbies
+  * Martial Arts, Travelling, Creative Media Production
 
 Publications
 ======
