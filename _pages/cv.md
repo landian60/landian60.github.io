@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "CV"
+title: "Guanmin Liu's CV"
 permalink: /cv/
 author_profile: true
 redirect_from:
@@ -8,29 +8,30 @@ redirect_from:
 ---
 
 {% include base_path %}
+---
 
-Education
+*EDUCATION*
 ======
-* M.S. in Shanghai, Tongji University (recommended for admission), 2021-2024(expected)
-* B.S. in Nanjing, Hohai University, 2017-2021
+* M.S. in Shanghai, **Tongji University** (recommended for admission), 2021-2024(expected)
+* B.S. in Nanjing, **Hohai University**, 2017-2021
 
 
-Work experience
+*WORK EXPERIENCE*
 ======
 * September 2022 - September 2023: Research Intern
   * Ele.me, Alibaba Group
-  * Study on text-image generation
+  * Study on multi-modal image generation and image editing
 
 * September 2021 – May 2024: Postgraduate Student
   * Intelligence Information Processing Laboratory, Tongji University
-  * Study on image-based 3D neural rendering representation
+  * Study on image-based 3D neural rendering representation and amodal segmentation
   <!-- * Supervisor: Zhihua Wei -->
   
 * May 2018 – June 2021: Undergraduate Student
   * Robotics Motion and Vision Laboratory, Hohai University
-  * Study on Visual SLAM and object detection
+  * Study on Visual SLAM
 
-Technical Skills & Others
+*TECHNICAL SKILLS & OTHERS*
 ======
 * Programming Languages 
   * Python, C++, Java, JavaScript, MATLAB, Latex, SQL
@@ -39,10 +40,18 @@ Technical Skills & Others
 * Hobbies
   * Martial Arts, Travelling, Creative Media Production
 
-Publications
+*PUBLICATIONS*
 ======
-  <ul>{% for post in site.publications %}
-    {% include archive-single-cv.html %}
+  <ul>
+  {% assign sorted_publications = site.publications | sort: 'order' %}
+  {% for post in sorted_publications %}
+    <li>
+      {% include archive-single-cv.html %}
+      <p><strong>Author: </strong> {{ post.excerpt }}</p>
+      <p><strong>Abstract:</strong> {{ post.abstract }}</p>
+      <img src="{{ post.image }}" alt="{{'image'}}">
+    </li>
+    <!-- {% include archive-single-cv.html %} -->
   {% endfor %}</ul>
   
 <!-- Talks
