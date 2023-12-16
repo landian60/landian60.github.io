@@ -35,7 +35,7 @@ layout: default
         {% endif %}
         
         {% if page.excerpt %}
-        <p class="page__date"><strong>Author: </strong> {{ page.excerpt }}</p>
+        <p class="archive__item-excerpt" itemprop="description"> {{ page.excerpt }}</p>
         {% endif %}
         
         {% if page.collection == 'teaching' %}

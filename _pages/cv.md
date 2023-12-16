@@ -8,6 +8,14 @@ redirect_from:
 ---
 
 {% include base_path %}
+
+<style>
+  .image-container {
+      max-width: 60%;
+      max-height: 60%;
+  }
+</style>
+
 ---
 
 *EDUCATION*
@@ -49,7 +57,9 @@ redirect_from:
       {% include archive-single-cv.html %}
       <p><strong>Author: </strong> {{ post.excerpt }}</p>
       <p><strong>Abstract:</strong> {{ post.abstract }}</p>
+      <div class="image-container">
       <img src="{{ post.image }}" alt="{{'image'}}">
+      </div>
     </li>
     <!-- {% include archive-single-cv.html %} -->
   {% endfor %}</ul>

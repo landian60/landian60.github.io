@@ -11,6 +11,12 @@
 {% else %}
   {% assign title = post.title %}
 {% endif %}
+<style>
+  .image-container {
+      max-width: 50%;
+      max-height: 50%;
+  }
+</style>
 
 <div class="{{ include.type | default: "list" }}__item">
   <article class="archive__item" itemscope itemtype="http://schema.org/CreativeWork">
@@ -30,9 +36,7 @@
       {% if post.link %}
         <a href="{{ post.link }}">{{ title }}</a> <a href="{{ base_path }}{{ post.url }}" rel="permalink"><i class="fa fa-link" aria-hidden="true" title="permalink"></i><span class="sr-only">Permalink</span></a>
       {% else %}
-        <!-- <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ title }}</a>
-         -->
-        <h3 rel="permalink">{{ title }}</h3>
+        <a href="{{ base_path }}{{ post.url }}" rel="permalink">{{ title }}</a>
       {% endif %}
     </h2>
     
@@ -53,7 +57,10 @@
     {% elsif post.excerpt and site.read_more == 'enabled' %}
     <p class="archive__item-excerpt" itemprop="description"><p>{{ post.excerpt | markdownify | remove: '<p>' | remove: '</p>' }}<strong><a href="{{ base_path }}{{ post.url }}" rel="permalink"> Read more</a></strong></p></p>
     {% endif %}
-    
+    <!-- <p><strong>Abstract:</strong> {{ post.abstract }}</p> -->
+    <div class="image-container">
+    <img src="{{ post.image }}" alt="{{'image'}}">
+    </div>
     {% if post.citation and post.paperurl %}
       <p>Recommended citation: {{ post.citation }} <a href="{{ post.paperurl }}"><u>{{ post.paperurl }}</u></a></p>
     {% elsif post.citation %}
