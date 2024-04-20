@@ -7,12 +7,12 @@ redirect_from:
   - /about.html
 ---
 
-Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Computer Vision**, particularly in the topic of Generative Models, Image Representation (Implicit Neural Representation) and Multi-modal Learning.
+Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Computer Vision**, particularly in the topic of Generative Models, Image Representation (Implicit Neural Representation), Image Evaluation and Multi-modal Learning.
 
 News
 ======
 
+* Master's degree in hand and eager to pursue a PhD or research assistant position!
 * The first-authored paper "Extending Implicit Neural Representations for Text-to-Image Generation" is **accepted** by ICASSP 2024. 🎉
-* I am exploring an image evaluation metric based on multi-modal contrastive models like CLIP and signal frequency analysis to calculate the topology discrepancies.
-* The paper "VL-MTT: Lightweight Multitask Transfer for Visual-Language Pre-trained Models" is under submission.
-* Ramping up for my next TOEFL bout! 🚀📚💪
+* I have developed a generated image evaluation metric that considers both the intrinsic image characteristics and its alignment with human preferences based on CLIP and frequency analysis. This work is currently under review for ACM MM 2024.
+* Ramping up for my IELTS bout! 🚀📚💪

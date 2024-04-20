@@ -32,7 +32,8 @@ abstract: "Implicit neural representations (INRs) have demonstrated their effect
 </div>
 
 <!-- This paper is about the number 1. The number 2 is left for future work. -->
+[Download paper here 1](https://ieeexplore.ieee.org/document/10446171)
 
-[Download paper here](http://landian60.github.io/files/icassp24_ming_final.pdf)
+[Download paper here 2](http://landian60.github.io/files/icassp24_ming_final.pdf)
 
 <!-- Recommended citation: Your Name, You. (2009). "Paper Title Number 1." <i>Journal 1</i>. 1(1). -->

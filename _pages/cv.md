@@ -20,7 +20,7 @@ redirect_from:
 
 *EDUCATION*
 ======
-* M.S. in Shanghai, **Tongji University** (recommended for admission), 2021-2024(expected)
+* M.S. in Shanghai, **Tongji University** (recommended for admission), 2021-2024
 * B.S. in Nanjing, **Hohai University**, 2017-2021
 
 
@@ -32,7 +32,7 @@ redirect_from:
 
 * September 2021 – May 2024: Postgraduate Student
   * Intelligence Information Processing Laboratory, Tongji University
-  * Study on image-based 3D neural rendering representation and amodal segmentation
+  * Study on generated image evaluation, image-based 3D neural rendering representation and amodal segmentation
   <!-- * Supervisor: Zhihua Wei -->
   
 * May 2018 – June 2021: Undergraduate Student
