@@ -1,0 +1,350 @@
+<!-- 访客统计组件 -->
+<div id="visitor-stats" class="visitor-stats-container">
+  <div class="visitor-stats-box">
+    <div class="stats-header">
+      <i class="fas fa-chart-line"></i>
+      <span>访客统计</span>
+      <div class="stats-refresh" onclick="window.visitorStats && window.visitorStats.fetchLocationData()" title="刷新位置信息">
+        <i class="fas fa-sync-alt"></i>
+      </div>
+    </div>
+    
+    <div class="stats-content">
+      <div class="stat-item">
+        <div class="stat-value" id="visitor-count">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div class="stat-label">总访问量</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-value" id="today-count">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div class="stat-label">今日访问</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-value" id="online-count">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <div class="stat-label">在线人数</div>
+      </div>
+    </div>
+    
+    <div class="visitor-info">
+      <div id="visitor-location" class="location-info">
+        <i class="fas fa-map-marker-alt"></i>
+        <span id="location-text">正在获取位置信息...</span>
+      </div>
+      <div id="visitor-ip" class="ip-info">
+        <i class="fas fa-globe"></i>
+        <span id="ip-text">正在获取IP信息...</span>
+      </div>
+      <div class="additional-info">
+        <div class="info-item">
+          <i class="fas fa-clock"></i>
+          <span>当前时间: <span id="current-time"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.visitor-stats-container {
+  margin: 20px 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.visitor-stats-box {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.visitor-stats-box::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0.7;
+  animation: borderGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes borderGlow {
+  0% { opacity: 0.5; }
+  100% { opacity: 0.8; }
+}
+
+.stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stats-header .fas {
+  margin-right: 10px;
+}
+
+.stats-refresh {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.stats-refresh:hover {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+  transform: rotate(180deg);
+}
+
+.stats-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px 10px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.visitor-info {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 15px;
+  font-size: 14px;
+}
+
+.location-info, .ip-info, .info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  transition: color 0.3s ease;
+}
+
+.location-info:hover, .ip-info:hover, .info-item:hover {
+  color: #fff;
+}
+
+.location-info:last-child, .ip-info:last-child, .info-item:last-child {
+  margin-bottom: 0;
+}
+
+.additional-info {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item {
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .visitor-stats-box {
+    padding: 15px;
+  }
+  
+  .stats-content {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  
+  .stat-item {
+    padding: 10px 5px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+  }
+  
+  .visitor-info {
+    font-size: 13px;
+  }
+  
+  .stats-header {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-content {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .stat-item {
+    padding: 8px;
+  }
+  
+  .stat-value {
+    font-size: 18px;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.error-text {
+  color: #ffcccb;
+  font-style: italic;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* 加载动画 */
+.loading {
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 成功动画 */
+.success-animation {
+  animation: successPulse 0.6s ease-out;
+}
+
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+</style>
+
+<script src="{{ base_path }}/assets/js/visitor-stats.js"></script>
+
+<script>
+// 补充功能和实时时间显示
+(function() {
+  // 更新当前时间
+  function updateCurrentTime() {
+    const now = new Date();
+    const timeString = now.toLocaleString('zh-CN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+      timeElement.textContent = timeString;
+    }
+  }
+
+  // 添加一些交互效果
+  function addInteractiveEffects() {
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach(item => {
+      item.addEventListener('click', function() {
+        this.classList.add('success-animation');
+        setTimeout(() => {
+          this.classList.remove('success-animation');
+        }, 600);
+      });
+    });
+  }
+
+  // 初始化
+  function init() {
+    updateCurrentTime();
+    addInteractiveEffects();
+    
+    // 每秒更新时间
+    setInterval(updateCurrentTime, 1000);
+  }
+
+  // 页面加载完成后初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>

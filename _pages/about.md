@@ -7,7 +7,10 @@ redirect_from:
   - /about.html
 ---
 
-Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Computer Vision** and **Human-AI Collaboration**, particularly in the topic of Generative Models, Neural Representation and Multi-modal Learning.
+{% include visitor-stats.html %}
+{% include mobile-visitor-stats.html %}
+
+Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Computer Vision** and **Human-AI Collaboration**, particularly in the topic of Context-aware AI, Generative Models,  Multi-modal Learning and Neural Representation.
 
 News
 ======
