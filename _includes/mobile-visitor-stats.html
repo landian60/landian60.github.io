@@ -6,7 +6,7 @@
         <span class="mobile-stat-icon">👥</span>
         <div class="mobile-stat-content">
           <div class="mobile-stat-value" id="mobile-visitor-count">...</div>
-          <div class="mobile-stat-label">访客</div>
+          <div class="mobile-stat-label">Visits</div>
         </div>
       </div>
       
@@ -14,7 +14,7 @@
         <span class="mobile-stat-icon">📅</span>
         <div class="mobile-stat-content">
           <div class="mobile-stat-value" id="mobile-today-count">...</div>
-          <div class="mobile-stat-label">今日</div>
+          <div class="mobile-stat-label">Today</div>
         </div>
       </div>
       
@@ -22,14 +22,14 @@
         <span class="mobile-stat-icon">🌐</span>
         <div class="mobile-stat-content">
           <div class="mobile-stat-value" id="mobile-online-count">...</div>
-          <div class="mobile-stat-label">在线</div>
+          <div class="mobile-stat-label">Online</div>
         </div>
       </div>
     </div>
     
     <div class="mobile-location-info">
       <span class="location-emoji">📍</span>
-      <span id="mobile-location-text">获取位置中...</span>
+      <span id="mobile-location-text">Getting location...</span>
     </div>
   </div>
 </div>
@@ -232,7 +232,7 @@
 
     // 缩短位置文本以适应移动端
     shortenLocation(text) {
-      if (!text || text.includes('失败') || text.includes('获取')) {
+      if (!text || text.includes('Failed') || text.includes('Getting')) {
         return text;
       }
       

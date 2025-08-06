@@ -31,20 +31,18 @@ class AdvancedVisitorStats {
     this.init();
   }
 
-  async init() {
-    try {
-      await this.loadStats();
-      await this.updateVisitCounts();
-      await this.fetchLocationData();
-      this.startPeriodicUpdates();
-      this.setupVisibilityHandler();
-    } catch (error) {
-      console.error('访客统计初始化失败:', error);
-      this.showError();
-    }
-  }
-
-  // 加载统计数据
+    async init() {
+      try {
+        await this.loadStats();
+        await this.updateVisitCounts();
+        await this.fetchLocationData();
+        this.startPeriodicUpdates();
+        this.setupVisibilityHandler();
+      } catch (error) {
+        console.error('Visitor stats initialization failed:', error);
+        this.showError();
+      }
+    }  // 加载统计数据
   loadStats() {
     try {
       const stored = localStorage.getItem(this.config.storageKey);
@@ -61,7 +59,7 @@ class AdvancedVisitorStats {
         sessions: []
       };
     } catch (error) {
-      console.warn('加载统计数据失败, 使用默认值:', error);
+      console.warn('Failed to load stats data, using defaults:', error);
       this.stats = this.getDefaultStats();
     }
   }
@@ -209,7 +207,7 @@ class AdvancedVisitorStats {
         this.updateLocationDisplay(locationData);
       }
     } catch (error) {
-      console.error('获取位置信息失败:', error);
+      console.error('Failed to get location info:', error);
       this.updateLocationDisplay({ error: true });
     }
   }
@@ -231,14 +229,14 @@ class AdvancedVisitorStats {
 
         return this.processLocationData(data);
       } catch (error) {
-        console.warn(`位置获取尝试 ${attempt + 1} 失败:`, error);
+        console.warn(`Location fetch attempt ${attempt + 1} failed:`, error);
         
         if (attempt < this.config.retryAttempts - 1) {
           await this.delay(this.config.retryDelay * (attempt + 1));
         }
       }
     }
-    throw new Error('所有位置获取尝试都失败了');
+    throw new Error('All location fetch attempts failed');
   }
 
   // 处理位置数据
@@ -260,8 +258,8 @@ class AdvancedVisitorStats {
   // 更新位置显示
   updateLocationDisplay(data) {
     if (data.error) {
-      this.updateElement('ip-text', '获取失败', 'error-text');
-      this.updateElement('location-text', '位置信息获取失败', 'error-text');
+      this.updateElement('ip-text', 'Failed', 'error-text');
+      this.updateElement('location-text', 'Location unavailable', 'error-text');
       return;
     }
 
@@ -295,7 +293,7 @@ class AdvancedVisitorStats {
 
   // 掩码IP地址
   maskIP(ip) {
-    if (!ip || ip === '未知') return ip;
+    if (!ip || ip === 'Unknown') return ip;
     
     if (ip.includes('.')) {
       // IPv4
@@ -313,7 +311,7 @@ class AdvancedVisitorStats {
   // 格式化位置
   formatLocation(data) {
     const parts = [data.city, data.region, data.country].filter(Boolean);
-    return parts.length > 0 ? parts.join(', ') : '位置未知';
+    return parts.length > 0 ? parts.join(', ') : 'Location unknown';
   }
 
   // 更新所有显示
@@ -397,9 +395,9 @@ class AdvancedVisitorStats {
 
   // 显示错误
   showError() {
-    this.updateElement('visitor-count', '加载失败', 'error-text');
-    this.updateElement('today-count', '加载失败', 'error-text');
-    this.updateElement('online-count', '加载失败', 'error-text');
+    this.updateElement('visitor-count', 'Failed', 'error-text');
+    this.updateElement('today-count', 'Failed', 'error-text');
+    this.updateElement('online-count', 'Failed', 'error-text');
   }
 
   // 工具方法

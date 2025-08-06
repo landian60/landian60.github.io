@@ -7,9 +7,6 @@ redirect_from:
   - /about.html
 ---
 
-{% include visitor-stats.html %}
-{% include mobile-visitor-stats.html %}
-
 Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Computer Vision** and **Human-AI Collaboration**, particularly in the topic of Context-aware AI, Generative Models,  Multi-modal Learning and Neural Representation.
 
 News
@@ -21,3 +18,6 @@ News
 * The first-authored paper "Extending Implicit Neural Representations for Text-to-Image Generation" is **accepted** by ICASSP 2024. 🎉
 * I have developed a deepfake detection method of image generation based on CLIP and frequency analysis.
 * Ramping up for my TOEFL bout! 🚀📚💪
+
+{% include visitor-stats.html %}
+{% include mobile-visitor-stats.html %}

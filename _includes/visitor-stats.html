@@ -3,8 +3,8 @@
   <div class="visitor-stats-box">
     <div class="stats-header">
       <i class="fas fa-chart-line"></i>
-      <span>访客统计</span>
-      <div class="stats-refresh" onclick="window.visitorStats && window.visitorStats.fetchLocationData()" title="刷新位置信息">
+      <span>Visitor Statistics</span>
+      <div class="stats-refresh" onclick="window.visitorStats && window.visitorStats.fetchLocationData()" title="Refresh location info">
         <i class="fas fa-sync-alt"></i>
       </div>
     </div>
@@ -14,37 +14,37 @@
         <div class="stat-value" id="visitor-count">
           <i class="fas fa-spinner fa-spin"></i>
         </div>
-        <div class="stat-label">总访问量</div>
+        <div class="stat-label">Total Visits</div>
       </div>
       
       <div class="stat-item">
         <div class="stat-value" id="today-count">
           <i class="fas fa-spinner fa-spin"></i>
         </div>
-        <div class="stat-label">今日访问</div>
+        <div class="stat-label">Today</div>
       </div>
       
       <div class="stat-item">
         <div class="stat-value" id="online-count">
           <i class="fas fa-spinner fa-spin"></i>
         </div>
-        <div class="stat-label">在线人数</div>
+        <div class="stat-label">Online</div>
       </div>
     </div>
     
     <div class="visitor-info">
       <div id="visitor-location" class="location-info">
         <i class="fas fa-map-marker-alt"></i>
-        <span id="location-text">正在获取位置信息...</span>
+        <span id="location-text">Getting location...</span>
       </div>
       <div id="visitor-ip" class="ip-info">
         <i class="fas fa-globe"></i>
-        <span id="ip-text">正在获取IP信息...</span>
+        <span id="ip-text">Getting IP info...</span>
       </div>
       <div class="additional-info">
         <div class="info-item">
           <i class="fas fa-clock"></i>
-          <span>当前时间: <span id="current-time"></span></span>
+          <span>Current Time: <span id="current-time"></span></span>
         </div>
       </div>
     </div>
@@ -53,48 +53,38 @@
 
 <style>
 .visitor-stats-container {
-  margin: 20px 0;
+  margin: 30px 0 20px 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .visitor-stats-box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  position: relative;
-  overflow: hidden;
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+  font-size: 14px;
 }
 
-.visitor-stats-box::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, #667eea, #764ba2, #667eea);
-  border-radius: 14px;
-  z-index: -1;
-  opacity: 0.7;
-  animation: borderGlow 3s ease-in-out infinite alternate;
-}
-
-@keyframes borderGlow {
-  0% { opacity: 0.5; }
-  100% { opacity: 0.8; }
+.visitor-stats-box {
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+  font-size: 14px;
 }
 
 .stats-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 15px;
-  font-size: 18px;
-  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #6c757d;
 }
 
 .stats-header .fas {
@@ -103,73 +93,72 @@
 
 .stats-refresh {
   cursor: pointer;
-  padding: 5px;
+  padding: 4px;
   border-radius: 50%;
-  transition: all 0.3s ease;
-  opacity: 0.7;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+  color: #6c757d;
 }
 
 .stats-refresh:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(108, 117, 125, 0.1);
   opacity: 1;
   transform: rotate(180deg);
 }
 
 .stats-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 12px;
+  margin-bottom: 15px;
 }
 
 .stat-item {
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 15px 10px;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #fff;
+  border-radius: 6px;
+  padding: 12px 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
 }
 
 .stat-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  transform: translateY(-1px);
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #495057;
 }
 
 .stat-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 11px;
+  color: #6c757d;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 .visitor-info {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 15px;
-  font-size: 14px;
+  border-top: 1px solid #e9ecef;
+  padding-top: 12px;
+  font-size: 12px;
 }
 
 .location-info, .ip-info, .info-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  color: rgba(255, 255, 255, 0.9);
-  transition: color 0.3s ease;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: #6c757d;
+  transition: color 0.2s ease;
 }
 
 .location-info:hover, .ip-info:hover, .info-item:hover {
-  color: #fff;
+  color: #495057;
 }
 
 .location-info:last-child, .ip-info:last-child, .info-item:last-child {
@@ -177,39 +166,39 @@
 }
 
 .additional-info {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e9ecef;
 }
 
 .info-item {
-  font-size: 13px;
+  font-size: 11px;
 }
 
 @media (max-width: 768px) {
   .visitor-stats-box {
-    padding: 15px;
+    padding: 12px;
   }
   
   .stats-content {
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 8px;
   }
   
   .stat-item {
-    padding: 10px 5px;
+    padding: 8px 6px;
   }
   
   .stat-value {
-    font-size: 20px;
+    font-size: 16px;
   }
   
   .visitor-info {
-    font-size: 13px;
+    font-size: 11px;
   }
   
   .stats-header {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -244,7 +233,7 @@
 }
 
 .error-text {
-  color: #ffcccb;
+  color: #dc3545;
   font-style: italic;
 }
 
@@ -302,7 +291,7 @@
   // 更新当前时间
   function updateCurrentTime() {
     const now = new Date();
-    const timeString = now.toLocaleString('zh-CN', {
+    const timeString = now.toLocaleString('en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
