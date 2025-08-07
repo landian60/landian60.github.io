@@ -400,12 +400,17 @@ class WorldMapVisitorStats {
 
   // 同步主统计数据
   syncWithMainStats() {
+    console.log('Syncing with main stats...');
+    
     // 等待主统计加载
     const checkMainStats = () => {
       if (window.visitorStats) {
+        console.log('Main stats found, updating displays...');
         this.updateStatsDisplay();
         this.updateCurrentVisitor();
+        this.showVisitorDistribution(); // 确保在同步后显示分布
       } else {
+        console.log('Main stats not ready, waiting...');
         setTimeout(checkMainStats, 200);
       }
     };
@@ -622,44 +627,89 @@ class WorldMapVisitorStats {
   showCountryInfo(countryCode, countryName) {
     try {
       const mainStats = window.visitorStats?.stats;
-      if (!mainStats || !mainStats.visitors) return;
+      if (!mainStats || !mainStats.visitors) {
+        this.showTooltip(`${countryName}: No visitor data available`);
+        return;
+      }
 
       let visitorCount = 0;
+      let recentVisits = [];
+      
       Object.values(mainStats.visitors).forEach(visitor => {
         if (visitor.country === countryName || 
-            visitor.countryCode === countryCode.toLowerCase()) {
+            visitor.countryCode === countryCode.toLowerCase() ||
+            this.getCountryCode(visitor.country) === countryCode) {
           visitorCount++;
+          if (visitor.lastVisit) {
+            recentVisits.push(new Date(visitor.lastVisit));
+          }
         }
       });
 
       // 显示信息提示
-      const message = visitorCount > 0 
+      let message = visitorCount > 0 
         ? `${countryName}: ${visitorCount} visitor${visitorCount > 1 ? 's' : ''}`
         : `${countryName}: No visitors yet`;
+        
+      if (recentVisits.length > 0) {
+        const lastVisit = new Date(Math.max(...recentVisits));
+        const timeAgo = this.getTimeAgo(lastVisit);
+        message += `\nLast visit: ${timeAgo}`;
+      }
       
-      // 临时显示信息（可以改为更好的UI）
-      const tooltip = document.createElement('div');
-      tooltip.textContent = message;
-      tooltip.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #333;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 4px;
-        z-index: 1000;
-        font-size: 14px;
-      `;
-      document.body.appendChild(tooltip);
-      
-      setTimeout(() => {
-        document.body.removeChild(tooltip);
-      }, 3000);
+      this.showTooltip(message);
       
     } catch (error) {
       console.warn('Failed to show country info:', error);
+      this.showTooltip(`${countryName}: Unable to load visitor data`);
     }
+  }
+
+  // 显示提示信息
+  showTooltip(message) {
+    // 移除现有提示
+    const existing = document.querySelector('.map-tooltip');
+    if (existing) existing.remove();
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'map-tooltip';
+    tooltip.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 6px;
+      z-index: 1000;
+      font-size: 14px;
+      max-width: 250px;
+      white-space: pre-line;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    
+    tooltip.textContent = message;
+    document.body.appendChild(tooltip);
+    
+    setTimeout(() => {
+      if (tooltip.parentNode) {
+        tooltip.parentNode.removeChild(tooltip);
+      }
+    }, 4000);
+  }
+
+  // 计算时间差
+  getTimeAgo(date) {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    
+    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    return 'Just now';
   }
 
   // 开始周期性更新
@@ -667,6 +717,7 @@ class WorldMapVisitorStats {
     setInterval(() => {
       this.updateCurrentTime();
       this.updateStatsDisplay();
+      this.showVisitorDistribution(); // 周期性更新分布显示
     }, this.config.updateInterval);
 
     // 每秒更新时间
@@ -773,11 +824,17 @@ class WorldMapVisitorStats {
 
   // 显示访问者分布
   showVisitorDistribution() {
+    console.log('Showing visitor distribution...');
+    
     try {
       const mainStats = window.visitorStats?.stats;
-      if (!mainStats || !mainStats.visitors) return;
+      if (!mainStats || !mainStats.visitors) {
+        console.log('No visitor data available for distribution');
+        return;
+      }
 
       const countryStats = {};
+      let totalVisitors = 0;
       
       // 统计每个国家的访问次数
       Object.values(mainStats.visitors).forEach(visitor => {
@@ -785,23 +842,29 @@ class WorldMapVisitorStats {
           const countryCode = this.getCountryCode(visitor.country);
           if (countryCode) {
             countryStats[countryCode] = (countryStats[countryCode] || 0) + 1;
+            totalVisitors++;
           }
         }
       });
 
+      console.log('Country stats:', countryStats, 'Total visitors:', totalVisitors);
+
       // 在地图上显示分布
       Object.entries(countryStats).forEach(([countryCode, count]) => {
-        const element = this.svg.querySelector(`[data-country="${countryCode}"]`);
+        const element = this.svg?.querySelector(`[data-country="${countryCode}"]`);
         if (element) {
           element.classList.add('has-visitors');
           element.setAttribute('data-visitor-count', count);
           // 根据访问量设置不同的颜色深度
-          const opacity = Math.min(count * 0.2 + 0.3, 1);
+          const opacity = Math.min(count * 0.3 + 0.4, 1);
           element.style.fill = `rgba(76, 175, 80, ${opacity})`;
+          console.log(`Set color for ${countryCode}: ${count} visitors, opacity: ${opacity}`);
         }
       });
+      
+      console.log('Visitor distribution display complete');
     } catch (error) {
-      console.warn('Failed to show visitor distribution:', error);
+      console.error('Failed to show visitor distribution:', error);
     }
   }
 
