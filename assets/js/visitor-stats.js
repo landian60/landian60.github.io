@@ -86,16 +86,22 @@ class AdvancedVisitorStats {
     const today = this.getDateKey(now);
     const session = this.getCurrentSession();
 
-    // 检查是否为新会话
-    if (this.isNewSession(session)) {
+    // 检查是否为新访客（更严格的条件）
+    if (this.isNewVisitor()) {
       this.stats.totalVisits += 1;
       this.recordVisit(today, now);
-      this.createNewSession(now);
+      
+      // 更新最后访问时间
+      this.stats.lastVisit = now;
+      this.saveStats();
+      
+      console.log(`New visit recorded. Total: ${this.stats.totalVisits}`);
     }
 
-    // 更新最后访问时间
-    this.stats.lastVisit = now;
-    this.saveStats();
+    // 创建会话（用于在线统计）
+    if (this.isNewSession(session)) {
+      this.createNewSession(now);
+    }
 
     // 更新显示
     this.updateDisplays();
@@ -106,6 +112,16 @@ class AdvancedVisitorStats {
     if (!session) return true;
     const sessionAge = Date.now() - session.startTime;
     return sessionAge > this.config.sessionTimeout;
+  }
+
+  // 检查是否为新访客（基于更严格的条件）
+  isNewVisitor() {
+    const lastVisit = this.stats.lastVisit;
+    if (!lastVisit) return true;
+    
+    // 如果上次访问超过4小时，算作新访问
+    const timeDiff = Date.now() - lastVisit;
+    return timeDiff > (4 * 60 * 60 * 1000);
   }
 
   // 获取当前会话
@@ -141,7 +157,7 @@ class AdvancedVisitorStats {
         this.stats.sessions = this.stats.sessions.slice(-100);
       }
     } catch (error) {
-      console.warn('无法创建会话:', error);
+      console.warn('Unable to create session:', error);
     }
   }
 
@@ -371,9 +387,12 @@ class AdvancedVisitorStats {
   // 保存统计数据
   saveStats() {
     try {
+      // 添加时间戳验证
+      this.stats.lastSave = Date.now();
       localStorage.setItem(this.config.storageKey, JSON.stringify(this.stats));
+      console.log(`Stats saved. Total visits: ${this.stats.totalVisits}`);
     } catch (error) {
-      console.warn('保存统计数据失败:', error);
+      console.warn('Failed to save stats:', error);
     }
   }
 
