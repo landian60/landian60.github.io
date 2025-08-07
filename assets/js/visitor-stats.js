@@ -31,18 +31,20 @@ class AdvancedVisitorStats {
     this.init();
   }
 
-    async init() {
-      try {
-        await this.loadStats();
-        await this.updateVisitCounts();
-        await this.fetchLocationData();
-        this.startPeriodicUpdates();
-        this.setupVisibilityHandler();
-      } catch (error) {
-        console.error('Visitor stats initialization failed:', error);
-        this.showError();
-      }
-    }  // 加载统计数据
+  async init() {
+    try {
+      await this.loadStats();
+      await this.updateVisitCounts();
+      await this.fetchLocationData();
+      this.startPeriodicUpdates();
+      this.setupVisibilityHandler();
+    } catch (error) {
+      console.error('Visitor stats initialization failed:', error);
+      this.showError();
+    }
+  }
+
+  // 加载统计数据
   loadStats() {
     try {
       const stored = localStorage.getItem(this.config.storageKey);
