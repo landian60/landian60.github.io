@@ -1,11 +1,11 @@
 <!-- 访客统计切换器 -->
 <div id="visitor-stats-switcher" class="stats-switcher-container">
   <div class="switcher-tabs">
-    <button class="tab-button active" data-tab="simple" onclick="switchStatsView('simple')">
+    <button class="tab-button active" data-tab="simple">
       <i class="fas fa-chart-bar"></i>
       Simple Stats
     </button>
-    <button class="tab-button" data-tab="map" onclick="switchStatsView('map')">
+    <button class="tab-button" data-tab="map">
       <i class="fas fa-globe"></i>
       World Map
     </button>
@@ -50,6 +50,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  pointer-events: auto;
+  user-select: none;
 }
 
 .tab-button:hover {
@@ -128,10 +130,14 @@
 // 统计视图切换功能
 let currentView = 'simple';
 
-function switchStatsView(viewType) {
+// 确保函数在全局作用域
+window.switchStatsView = function(viewType) {
   console.log('Switching to view:', viewType);
   
-  if (currentView === viewType) return;
+  if (currentView === viewType) {
+    console.log('Already on this view, skipping...');
+    return;
+  }
 
   // 更新按钮状态
   document.querySelectorAll('.tab-button').forEach(btn => {
@@ -141,6 +147,7 @@ function switchStatsView(viewType) {
   const targetButton = document.querySelector(`[data-tab="${viewType}"]`);
   if (targetButton) {
     targetButton.classList.add('active');
+    console.log('Button updated for tab:', viewType);
   } else {
     console.error('Button not found for tab:', viewType);
   }
@@ -172,17 +179,25 @@ function switchStatsView(viewType) {
     // 显示新视图
     if (viewType === 'simple') {
       simpleView.classList.add('active', 'fade-in-view');
+      console.log('Switched to simple view');
     } else {
       mapView.classList.add('active', 'fade-in-view');
+      console.log('Switched to map view');
       
       // 如果切换到地图视图，初始化或刷新地图统计
-      if (window.worldMapStats) {
-        console.log('Refreshing world map stats...');
-        window.worldMapStats.updateStatsDisplay();
-        window.worldMapStats.updateCurrentVisitor();
-      } else {
-        console.log('World map stats not available');
-      }
+      setTimeout(() => {
+        if (window.worldMapStats) {
+          console.log('Refreshing world map stats...');
+          window.worldMapStats.updateStatsDisplay();
+          window.worldMapStats.updateCurrentVisitor();
+        } else {
+          console.log('World map stats not available, creating...');
+          // 尝试重新创建world map stats
+          if (window.WorldMapVisitorStats) {
+            window.worldMapStats = new window.WorldMapVisitorStats();
+          }
+        }
+      }, 100);
     }
 
     // 移除加载状态和动画类
@@ -201,14 +216,31 @@ function switchStatsView(viewType) {
       console.warn('Could not save view preference:', error);
     }
   }, 200);
+};
+
+function switchStatsView(viewType) {
+  window.switchStatsView(viewType);
 }
 
 // 页面加载时恢复用户偏好
 function initializeStatsView() {
+  console.log('Initializing stats view...');
+  
+  // 添加点击事件监听器（备用方案）
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', function() {
+      const tabType = this.getAttribute('data-tab');
+      console.log('Button clicked via event listener:', tabType);
+      window.switchStatsView(tabType);
+    });
+  });
+  
   try {
     const savedView = localStorage.getItem('preferred_stats_view');
     if (savedView && savedView !== 'simple') {
-      switchStatsView(savedView);
+      setTimeout(() => {
+        window.switchStatsView(savedView);
+      }, 500);
     }
   } catch (error) {
     console.warn('Could not load view preference:', error);
@@ -222,17 +254,23 @@ if (document.readyState === 'loading') {
   initializeStatsView();
 }
 
+// 调试用测试函数
+window.testMapSwitch = function() {
+  console.log('Testing map switch...');
+  window.switchStatsView('map');
+};
+
 // 键盘快捷键 (可选)
 document.addEventListener('keydown', function(e) {
   // Ctrl/Cmd + 1 = 简单视图
   if ((e.ctrlKey || e.metaKey) && e.key === '1') {
     e.preventDefault();
-    switchStatsView('simple');
+    window.switchStatsView('simple');
   }
   // Ctrl/Cmd + 2 = 地图视图
   if ((e.ctrlKey || e.metaKey) && e.key === '2') {
     e.preventDefault();
-    switchStatsView('map');
+    window.switchStatsView('map');
   }
 });
 </script>
