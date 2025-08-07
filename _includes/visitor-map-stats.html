@@ -18,16 +18,55 @@
   <div class="world-map-container">
     <div class="map-wrapper">
       <!-- 简化的SVG世界地图 -->
-      <svg viewBox="0 0 1000 500" class="world-map">
+      <svg viewBox="0 0 1000 500" class="world-map" id="world-map-svg">
         <defs>
           <style>
-            .country { fill: #e9ecef; stroke: #dee2e6; stroke-width: 0.5; transition: all 0.3s ease; }
-            .country:hover { fill: #007bff; opacity: 0.8; }
-            .visitor-marker { fill: #dc3545; stroke: #fff; stroke-width: 2; animation: pulse 2s infinite; }
+            .country { 
+              fill: #e9ecef; 
+              stroke: #dee2e6; 
+              stroke-width: 0.5; 
+              transition: all 0.3s ease;
+              cursor: pointer;
+            }
+            .country:hover { 
+              fill: #007bff; 
+              opacity: 0.8; 
+            }
+            .country.visited {
+              fill: #28a745 !important;
+              opacity: 0.8;
+            }
+            .country.has-visitors {
+              fill: #28a745 !important;
+              opacity: 0.6;
+            }
+            .country.country-highlight {
+              fill: #dc3545 !important;
+              opacity: 0.9;
+              animation: countryPulse 2s infinite;
+            }
+            .visitor-marker { 
+              fill: #dc3545; 
+              stroke: #fff; 
+              stroke-width: 2; 
+              animation: pulse 2s infinite;
+              cursor: pointer;
+            }
+            .visitor-history-marker {
+              fill: #28a745;
+              stroke: #fff;
+              stroke-width: 1;
+              opacity: 0.8;
+            }
             @keyframes pulse {
               0% { opacity: 1; transform: scale(1); }
               50% { opacity: 0.7; transform: scale(1.2); }
               100% { opacity: 1; transform: scale(1); }
+            }
+            @keyframes countryPulse {
+              0% { opacity: 0.9; }
+              50% { opacity: 0.6; }
+              100% { opacity: 0.9; }
             }
           </style>
         </defs>
@@ -296,7 +335,7 @@
 class WorldMapVisitorStats {
   constructor() {
     this.config = {
-      maxRecentVisitors: 10,
+      maxRecentVisitors: 20,
       updateInterval: 30000, // 30秒更新一次
       countryCoordinates: {
         'CN': { x: 700, y: 175, name: 'China' },
@@ -310,19 +349,53 @@ class WorldMapVisitorStats {
         'AU': { x: 800, y: 340, name: 'Australia' },
         'IN': { x: 630, y: 240, name: 'India' },
         'BR': { x: 240, y: 335, name: 'Brazil' },
-        'RU': { x: 650, y: 120, name: 'Russia' }
+        'RU': { x: 650, y: 120, name: 'Russia' },
+        'MX': { x: 200, y: 225, name: 'Mexico' },
+        'EU': { x: 470, y: 150, name: 'Europe' }
       }
     };
     
     this.recentVisitors = this.loadRecentVisitors();
+    this.visitedCountries = this.loadVisitedCountries();
+    this.currentCountry = null;
     this.init();
   }
 
   init() {
-    this.syncWithMainStats();
-    this.updateCurrentTime();
-    this.startPeriodicUpdates();
-    this.setupInteractions();
+    // 延迟初始化，等待DOM完全加载
+    setTimeout(() => {
+      this.initializeSVG();
+      this.syncWithMainStats();
+      this.updateCurrentTime();
+      this.setupInteractions();
+      this.displayVisitorHistory();
+      this.highlightVisitedCountries();
+      this.showVisitorDistribution();
+      this.startPeriodicUpdates();
+    }, 800);
+  }
+
+  // 初始化SVG
+  initializeSVG() {
+    this.svg = document.querySelector('#world-map-svg');
+    console.log('SVG Element found:', this.svg);
+    
+    if (this.svg) {
+      // 确保所有国家元素都有正确的类名和属性
+      const countries = this.svg.querySelectorAll('path[data-country]');
+      console.log('Countries found:', countries.length);
+      
+      countries.forEach(path => {
+        if (!path.classList.contains('country')) {
+          path.classList.add('country');
+        }
+        path.style.cursor = 'pointer';
+      });
+      
+      console.log('SVG initialization complete');
+    } else {
+      console.error('World map SVG not found! ID: #world-map-svg');
+    }
   }
 
   // 同步主统计数据
@@ -333,7 +406,7 @@ class WorldMapVisitorStats {
         this.updateStatsDisplay();
         this.updateCurrentVisitor();
       } else {
-        setTimeout(checkMainStats, 100);
+        setTimeout(checkMainStats, 200);
       }
     };
     checkMainStats();
@@ -392,11 +465,19 @@ class WorldMapVisitorStats {
   addVisitorToMap(data) {
     if (data.error || !data.countryCode) return;
 
-    const coords = this.config.countryCoordinates[data.countryCode.toUpperCase()];
+    const countryCode = data.countryCode.toUpperCase();
+    
+    // 添加到访问过的国家列表
+    if (!this.visitedCountries.includes(countryCode)) {
+      this.visitedCountries.push(countryCode);
+      this.saveVisitedCountries();
+    }
+
+    const coords = this.config.countryCoordinates[countryCode];
     if (!coords) return;
 
     // 高亮对应国家
-    this.highlightCountry(data.countryCode);
+    this.highlightCountry(countryCode);
 
     // 添加访客标记点
     const markersGroup = document.getElementById('visitor-markers');
@@ -411,6 +492,9 @@ class WorldMapVisitorStats {
       marker.setAttribute('r', '5');
       marker.setAttribute('class', 'visitor-marker');
       marker.setAttribute('title', `Current visitor from ${coords.name}`);
+      marker.style.fill = '#ff4444';
+      marker.style.stroke = '#ffffff';
+      marker.style.strokeWidth = '2';
       
       markersGroup.appendChild(marker);
     }
@@ -503,15 +587,79 @@ class WorldMapVisitorStats {
 
   // 设置交互
   setupInteractions() {
-    // 国家悬停效果
-    document.querySelectorAll('.country').forEach(country => {
-      country.addEventListener('mouseenter', function() {
-        const title = this.getAttribute('title');
-        if (title) {
-          this.setAttribute('data-tooltip', title);
+    console.log('Setting up interactions, SVG:', this.svg);
+    
+    // 国家悬停和点击效果
+    if (this.svg) {
+      const countries = this.svg.querySelectorAll('.country');
+      console.log('Setting up interactions for', countries.length, 'countries');
+      
+      countries.forEach(country => {
+        // 悬停效果
+        country.addEventListener('mouseenter', function() {
+          const title = this.getAttribute('title');
+          if (title) {
+            this.setAttribute('data-tooltip', title);
+          }
+        });
+
+        // 点击效果
+        country.addEventListener('click', (e) => {
+          const countryCode = country.getAttribute('data-country');
+          const countryName = country.getAttribute('title');
+          console.log('Country clicked:', countryCode, countryName);
+          this.showCountryInfo(countryCode, countryName);
+        });
+      });
+      
+      console.log('Interactions setup complete');
+    } else {
+      console.error('Cannot setup interactions: SVG not found');
+    }
+  }
+
+  // 显示国家信息
+  showCountryInfo(countryCode, countryName) {
+    try {
+      const mainStats = window.visitorStats?.stats;
+      if (!mainStats || !mainStats.visitors) return;
+
+      let visitorCount = 0;
+      Object.values(mainStats.visitors).forEach(visitor => {
+        if (visitor.country === countryName || 
+            visitor.countryCode === countryCode.toLowerCase()) {
+          visitorCount++;
         }
       });
-    });
+
+      // 显示信息提示
+      const message = visitorCount > 0 
+        ? `${countryName}: ${visitorCount} visitor${visitorCount > 1 ? 's' : ''}`
+        : `${countryName}: No visitors yet`;
+      
+      // 临时显示信息（可以改为更好的UI）
+      const tooltip = document.createElement('div');
+      tooltip.textContent = message;
+      tooltip.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #333;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        z-index: 1000;
+        font-size: 14px;
+      `;
+      document.body.appendChild(tooltip);
+      
+      setTimeout(() => {
+        document.body.removeChild(tooltip);
+      }, 3000);
+      
+    } catch (error) {
+      console.warn('Failed to show country info:', error);
+    }
   }
 
   // 开始周期性更新
@@ -589,14 +737,107 @@ class WorldMapVisitorStats {
       console.warn('Failed to save recent visitors:', error);
     }
   }
+
+  loadVisitedCountries() {
+    try {
+      const stored = localStorage.getItem('visitedCountries');
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  saveVisitedCountries() {
+    try {
+      localStorage.setItem('visitedCountries', JSON.stringify(this.visitedCountries));
+    } catch (error) {
+      console.warn('Failed to save visited countries:', error);
+    }
+  }
+
+  // 高亮访问过的国家
+  highlightVisitedCountries() {
+    try {
+      const visitedCountries = JSON.parse(localStorage.getItem('visitedCountries') || '[]');
+      visitedCountries.forEach(countryCode => {
+        const element = this.svg.querySelector(`[data-country="${countryCode}"]`);
+        if (element) {
+          element.classList.add('visited');
+          element.style.fill = '#4CAF50'; // 绿色表示访问过
+        }
+      });
+    } catch (error) {
+      console.warn('Failed to highlight visited countries:', error);
+    }
+  }
+
+  // 显示访问者分布
+  showVisitorDistribution() {
+    try {
+      const mainStats = window.visitorStats?.stats;
+      if (!mainStats || !mainStats.visitors) return;
+
+      const countryStats = {};
+      
+      // 统计每个国家的访问次数
+      Object.values(mainStats.visitors).forEach(visitor => {
+        if (visitor.country) {
+          const countryCode = this.getCountryCode(visitor.country);
+          if (countryCode) {
+            countryStats[countryCode] = (countryStats[countryCode] || 0) + 1;
+          }
+        }
+      });
+
+      // 在地图上显示分布
+      Object.entries(countryStats).forEach(([countryCode, count]) => {
+        const element = this.svg.querySelector(`[data-country="${countryCode}"]`);
+        if (element) {
+          element.classList.add('has-visitors');
+          element.setAttribute('data-visitor-count', count);
+          // 根据访问量设置不同的颜色深度
+          const opacity = Math.min(count * 0.2 + 0.3, 1);
+          element.style.fill = `rgba(76, 175, 80, ${opacity})`;
+        }
+      });
+    } catch (error) {
+      console.warn('Failed to show visitor distribution:', error);
+    }
+  }
+
+  // 获取国家代码
+  getCountryCode(countryName) {
+    const countryMap = {
+      'United States': 'US',
+      'China': 'CN',
+      'Japan': 'JP',
+      'Germany': 'DE',
+      'United Kingdom': 'GB',
+      'France': 'FR',
+      'Canada': 'CA',
+      'Australia': 'AU',
+      'South Korea': 'KR',
+      'India': 'IN',
+      'Brazil': 'BR',
+      'Russia': 'RU'
+    };
+    return countryMap[countryName] || countryName?.substring(0, 2).toUpperCase();
+  }
 }
 
 // 初始化世界地图统计
+console.log('Initializing World Map Stats...');
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, creating WorldMapVisitorStats...');
     window.worldMapStats = new WorldMapVisitorStats();
   });
 } else {
+  console.log('DOM already ready, creating WorldMapVisitorStats...');
   window.worldMapStats = new WorldMapVisitorStats();
 }
+
+// 导出到全局以便调试
+window.WorldMapVisitorStats = WorldMapVisitorStats;
 </script>

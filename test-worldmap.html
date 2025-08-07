@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Map Test</title>
+    <script src="assets/js/visitor-stats.js"></script>
+</head>
+<body>
+    <h1>World Map Visitor Statistics Test</h1>
+    
+    <!-- Include the world map component -->
+    {% include visitor-map-stats.html %}
+    
+    <script>
+    // Initialize main visitor stats first
+    setTimeout(() => {
+        if (!window.visitorStats) {
+            window.visitorStats = new AdvancedVisitorStats();
+        }
+    }, 100);
+    
+    // Debug information
+    setTimeout(() => {
+        console.log('Visitor Stats:', window.visitorStats);
+        console.log('World Map Stats:', window.worldMapStats);
+        
+        if (window.worldMapStats) {
+            console.log('SVG Element:', window.worldMapStats.svg);
+            console.log('Visited Countries:', window.worldMapStats.visitedCountries);
+        }
+    }, 2000);
+    </script>
+</body>
+</html>
