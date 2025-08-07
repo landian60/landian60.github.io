@@ -364,6 +364,7 @@ class WorldMapVisitorStats {
   init() {
     // 延迟初始化，等待DOM完全加载
     setTimeout(() => {
+      console.log('WorldMapStats: Starting initialization...');
       this.initializeSVG();
       this.syncWithMainStats();
       this.updateCurrentTime();
@@ -372,7 +373,8 @@ class WorldMapVisitorStats {
       this.highlightVisitedCountries();
       this.showVisitorDistribution();
       this.startPeriodicUpdates();
-    }, 800);
+      console.log('WorldMapStats: Initialization complete');
+    }, 1000); // 增加延迟时间
   }
 
   // 初始化SVG
@@ -404,14 +406,15 @@ class WorldMapVisitorStats {
     
     // 等待主统计加载
     const checkMainStats = () => {
-      if (window.visitorStats) {
+      if (window.visitorStats && window.visitorStats.stats) {
         console.log('Main stats found, updating displays...');
+        console.log('Visitors data:', window.visitorStats.stats.visitors);
         this.updateStatsDisplay();
         this.updateCurrentVisitor();
         this.showVisitorDistribution(); // 确保在同步后显示分布
       } else {
         console.log('Main stats not ready, waiting...');
-        setTimeout(checkMainStats, 200);
+        setTimeout(checkMainStats, 300);
       }
     };
     checkMainStats();

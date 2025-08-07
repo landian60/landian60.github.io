@@ -54,6 +54,7 @@ class AdvancedVisitorStats {
         dailyStats: {},
         weeklyStats: {},
         monthlyStats: {},
+        visitors: {}, // 添加visitors对象用于存储访客信息
         firstVisit: Date.now(),
         lastVisit: null,
         userAgent: navigator.userAgent,
@@ -74,6 +75,7 @@ class AdvancedVisitorStats {
       dailyStats: {},
       weeklyStats: {},
       monthlyStats: {},
+      visitors: {}, // 添加visitors对象
       firstVisit: Date.now(),
       lastVisit: null,
       userAgent: navigator.userAgent,
@@ -294,6 +296,46 @@ class AdvancedVisitorStats {
       const flag = this.getCountryFlag(data.countryCode);
       this.updateElement('location-text', `${flag} ${location}`);
     }
+
+    // 保存访客信息到visitors对象（用于世界地图）
+    this.saveVisitorInfo(data);
+  }
+
+  // 保存访客信息
+  saveVisitorInfo(data) {
+    if (data.error || !data.ip) return;
+
+    const visitorId = this.generateVisitorId(data.ip);
+    const now = Date.now();
+    
+    if (!this.stats.visitors) {
+      this.stats.visitors = {};
+    }
+
+    // 更新或创建访客记录
+    this.stats.visitors[visitorId] = {
+      ip: data.ip,
+      city: data.city,
+      region: data.region,
+      country: data.country,
+      countryCode: data.countryCode,
+      firstVisit: this.stats.visitors[visitorId]?.firstVisit || now,
+      lastVisit: now,
+      visitCount: (this.stats.visitors[visitorId]?.visitCount || 0) + 1
+    };
+
+    this.saveStats();
+  }
+
+  // 生成访客ID（基于IP的哈希）
+  generateVisitorId(ip) {
+    let hash = 0;
+    for (let i = 0; i < ip.length; i++) {
+      const char = ip.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // 转换为32位整数
+    }
+    return Math.abs(hash).toString(36);
   }
 
   // 获取国家旗帜emoji
@@ -343,30 +385,47 @@ class AdvancedVisitorStats {
     this.updateElement('online-count', onlineCount);
   }
 
-  // 计算在线用户数（模拟算法）
+  // 计算在线用户数（基于真实访客数据的模拟算法）
   calculateOnlineUsers() {
+    if (!this.stats.visitors) return 1;
+
+    const now = Date.now();
+    const recentThreshold = 30 * 60 * 1000; // 30分钟内算作在线
     const hour = new Date().getHours();
-    const dayOfWeek = new Date().getDay();
     
-    // 基于时间的基础人数
-    let baseCount;
+    // 计算最近活跃的访客数量
+    const recentVisitors = Object.values(this.stats.visitors).filter(visitor => {
+      return (now - visitor.lastVisit) < recentThreshold;
+    }).length;
+
+    // 基于时间的基础倍数
+    let multiplier;
     if (hour >= 9 && hour <= 18) {
-      baseCount = 8 + Math.floor(Math.sin((hour - 9) / 9 * Math.PI) * 5);
+      // 工作时间：较高活跃度
+      multiplier = 1.5 + Math.sin((hour - 9) / 9 * Math.PI) * 0.8;
     } else if (hour >= 19 && hour <= 23) {
-      baseCount = 6 + Math.floor(Math.sin((hour - 19) / 4 * Math.PI) * 3);
+      // 晚上：中等活跃度
+      multiplier = 1.2 + Math.sin((hour - 19) / 4 * Math.PI) * 0.5;
     } else {
-      baseCount = 1 + Math.floor(Math.random() * 3);
+      // 深夜/凌晨：低活跃度
+      multiplier = 0.3 + Math.random() * 0.4;
     }
 
     // 周末调整
+    const dayOfWeek = new Date().getDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) {
-      baseCount = Math.floor(baseCount * 0.7);
+      multiplier *= 0.8;
     }
 
-    // 添加随机因素
-    const randomFactor = Math.floor(Math.random() * 3) - 1;
+    // 计算估计在线数
+    let estimatedOnline = Math.max(1, Math.floor(recentVisitors * multiplier));
     
-    return Math.max(1, baseCount + randomFactor);
+    // 如果没有近期访客，至少显示1-3人在线
+    if (recentVisitors === 0) {
+      estimatedOnline = 1 + Math.floor(Math.random() * 3);
+    }
+
+    return estimatedOnline;
   }
 
   // 更新元素
@@ -402,7 +461,28 @@ class AdvancedVisitorStats {
   startPeriodicUpdates() {
     setInterval(() => {
       this.updateDisplays();
+      this.updateCurrentTime();
     }, this.config.updateInterval);
+
+    // 每秒更新时间
+    setInterval(() => {
+      this.updateCurrentTime();
+    }, 1000);
+  }
+
+  // 更新当前时间
+  updateCurrentTime() {
+    const timeString = new Date().toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+    
+    this.updateElement('current-time', timeString);
   }
 
   // 设置页面可见性处理

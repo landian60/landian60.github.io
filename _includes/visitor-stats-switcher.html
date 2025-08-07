@@ -129,17 +129,33 @@
 let currentView = 'simple';
 
 function switchStatsView(viewType) {
+  console.log('Switching to view:', viewType);
+  
   if (currentView === viewType) return;
 
   // 更新按钮状态
   document.querySelectorAll('.tab-button').forEach(btn => {
     btn.classList.remove('active');
   });
-  document.querySelector(`[data-tab="${viewType}"]`).classList.add('active');
+  
+  const targetButton = document.querySelector(`[data-tab="${viewType}"]`);
+  if (targetButton) {
+    targetButton.classList.add('active');
+  } else {
+    console.error('Button not found for tab:', viewType);
+  }
 
   // 切换视图
   const simpleView = document.getElementById('simple-stats-view');
   const mapView = document.getElementById('map-stats-view');
+
+  console.log('Simple view element:', simpleView);
+  console.log('Map view element:', mapView);
+
+  if (!simpleView || !mapView) {
+    console.error('View elements not found!');
+    return;
+  }
 
   // 添加加载状态
   const currentActiveView = document.querySelector('.stats-view.active');
@@ -161,8 +177,11 @@ function switchStatsView(viewType) {
       
       // 如果切换到地图视图，初始化或刷新地图统计
       if (window.worldMapStats) {
+        console.log('Refreshing world map stats...');
         window.worldMapStats.updateStatsDisplay();
         window.worldMapStats.updateCurrentVisitor();
+      } else {
+        console.log('World map stats not available');
       }
     }
 
