@@ -283,22 +283,54 @@ class AdvancedVisitorStats {
       return;
     }
 
-    // 更新IP（带隐私保护）
     const maskedIP = this.maskIP(data.ip);
     this.updateElement('ip-text', maskedIP);
 
-    // 更新位置
     const location = this.formatLocation(data);
     this.updateElement('location-text', location);
 
-    // 添加国旗emoji（如果有国家代码）
     if (data.countryCode) {
       const flag = this.getCountryFlag(data.countryCode);
       this.updateElement('location-text', `${flag} ${location}`);
     }
 
-    // 保存访客信息到visitors对象（用于世界地图）
+    // Save to local visitors index for map usage
     this.saveVisitorInfo(data);
+
+    // Optionally report to external endpoint (if configured)
+    this.reportVisitor(data).catch(() => {/* noop */});
+  }
+
+  // Report visitor to optional external endpoint (Google Apps Script / webhook etc.)
+  async reportVisitor(data) {
+    try {
+      const endpoint = (typeof window !== 'undefined' && window.VISITOR_API) ? window.VISITOR_API : '';
+      if (!endpoint) return; // silently skip if not configured
+
+      const payload = {
+        timestamp: Date.now(),
+        ip: data.ip || '',
+        countryCode: data.countryCode || '',
+        country: data.country || '',
+        region: data.region || '',
+        city: data.city || '',
+        timezone: data.timezone || '',
+        userAgent: navigator.userAgent,
+        referrer: document.referrer || '',
+      };
+
+      // POST JSON
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        // no-cors allows success without reading response on GAS default settings
+        mode: 'no-cors'
+      });
+    } catch (e) {
+      // Swallow errors to avoid impacting UX on GitHub Pages
+      console.warn('reportVisitor failed:', e);
+    }
   }
 
   // 保存访客信息

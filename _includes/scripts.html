@@ -1,4 +1,9 @@
 <script src="{{ site.baseurl }}/assets/js/main.min.js"></script>
+<script>
+  // Optional external reporting/reading endpoint, e.g. Google Apps Script Web App URL
+  // Configure by adding `visitor_report_endpoint: https://...` in _config.yml
+  window.VISITOR_API = '{{ site.visitor_report_endpoint | default: "" }}';
+</script>
 <script src="{{ site.baseurl }}/assets/js/visitor-stats.js"></script>
 
 {% include analytics.html %}
