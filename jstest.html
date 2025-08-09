@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JS Test</title>
+</head>
+<body>
+    <h1>JavaScript Test</h1>
+    <div id="test-output">Loading...</div>
+    
+    <script src="/assets/js/visitor-stats.js"></script>
+    <script>
+        setTimeout(() => {
+            document.getElementById('test-output').innerHTML = `
+                <p>Window visitorStats: ${typeof window.visitorStats}</p>
+                <p>AdvancedVisitorStats: ${typeof AdvancedVisitorStats}</p>
+                <p>Error check: ${window.visitorStats ? 'OK' : 'ERROR'}</p>
+                <p>Stats object: ${window.visitorStats ? JSON.stringify(window.visitorStats.stats, null, 2) : 'N/A'}</p>
+            `;
+        }, 2000);
+    </script>
+</body>
+</html>
