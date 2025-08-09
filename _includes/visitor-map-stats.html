@@ -557,13 +557,16 @@ class WorldMapVisitorStats {
       return;
     }
 
-    listElement.innerHTML = this.recentVisitors.map(visitor => `
-      <div class="visitor-entry fade-in-map">
-        <span class="visitor-flag">${visitor.flag}</span>
-        <span class="visitor-location">${visitor.location}</span>
-        <span class="visitor-time">${this.getRelativeTime(visitor.timestamp)}</span>
-      </div>
-    `).join('');
+    const self = this;
+    const visitorsHTML = this.recentVisitors.map(function(visitor) {
+      return '<div class="visitor-entry fade-in-map">' +
+        '<span class="visitor-flag">' + visitor.flag + '</span>' +
+        '<span class="visitor-location">' + visitor.location + '</span>' +
+        '<span class="visitor-time">' + self.getRelativeTime(visitor.timestamp) + '</span>' +
+        '</div>';
+    }).join('');
+    
+    listElement.innerHTML = visitorsHTML;
   }
 
   // 获取相对时间
@@ -572,9 +575,9 @@ class WorldMapVisitorStats {
     const diff = now - timestamp;
     
     if (diff < 60000) return 'Just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-    return `${Math.floor(diff / 86400000)}d ago`;
+    if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+    return Math.floor(diff / 86400000) + 'd ago';
   }
 
   // 更新当前时间
@@ -629,42 +632,44 @@ class WorldMapVisitorStats {
   // 显示国家信息
   showCountryInfo(countryCode, countryName) {
     try {
-      const mainStats = window.visitorStats?.stats;
+      const mainStats = window.visitorStats && window.visitorStats.stats;
       if (!mainStats || !mainStats.visitors) {
-        this.showTooltip(`${countryName}: No visitor data available`);
+        this.showTooltip(countryName + ': No visitor data available');
         return;
       }
 
       let visitorCount = 0;
       let recentVisits = [];
       
-      Object.values(mainStats.visitors).forEach(visitor => {
-        if (visitor.country === countryName || 
+      const visitors = mainStats.visitors;
+      for (const visitorId in visitors) {
+        const visitor = visitors[visitorId];
+        if (visitor && (visitor.country === countryName || 
             visitor.countryCode === countryCode.toLowerCase() ||
-            this.getCountryCode(visitor.country) === countryCode) {
+            this.getCountryCode(visitor.country) === countryCode)) {
           visitorCount++;
           if (visitor.lastVisit) {
             recentVisits.push(new Date(visitor.lastVisit));
           }
         }
-      });
+      }
 
       // 显示信息提示
       let message = visitorCount > 0 
-        ? `${countryName}: ${visitorCount} visitor${visitorCount > 1 ? 's' : ''}`
-        : `${countryName}: No visitors yet`;
+        ? countryName + ': ' + visitorCount + ' visitor' + (visitorCount > 1 ? 's' : '')
+        : countryName + ': No visitors yet';
         
       if (recentVisits.length > 0) {
-        const lastVisit = new Date(Math.max(...recentVisits));
+        const lastVisit = new Date(Math.max.apply(Math, recentVisits));
         const timeAgo = this.getTimeAgo(lastVisit);
-        message += `\nLast visit: ${timeAgo}`;
+        message += '\nLast visit: ' + timeAgo;
       }
       
       this.showTooltip(message);
       
     } catch (error) {
       console.warn('Failed to show country info:', error);
-      this.showTooltip(`${countryName}: Unable to load visitor data`);
+      this.showTooltip(countryName + ': Unable to load visitor data');
     }
   }
 
@@ -709,9 +714,9 @@ class WorldMapVisitorStats {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
     
-    if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-    if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+    if (days > 0) return days + ' day' + (days > 1 ? 's' : '') + ' ago';
+    if (hours > 0) return hours + ' hour' + (hours > 1 ? 's' : '') + ' ago';
+    if (minutes > 0) return minutes + ' minute' + (minutes > 1 ? 's' : '') + ' ago';
     return 'Just now';
   }
 
@@ -830,7 +835,7 @@ class WorldMapVisitorStats {
     console.log('Showing visitor distribution...');
     
     try {
-      const mainStats = window.visitorStats?.stats;
+      const mainStats = window.visitorStats && window.visitorStats.stats;
       if (!mainStats || !mainStats.visitors) {
         console.log('No visitor data available for distribution');
         return;
@@ -840,30 +845,33 @@ class WorldMapVisitorStats {
       let totalVisitors = 0;
       
       // 统计每个国家的访问次数
-      Object.values(mainStats.visitors).forEach(visitor => {
-        if (visitor.country) {
+      const visitors = mainStats.visitors;
+      for (const visitorId in visitors) {
+        const visitor = visitors[visitorId];
+        if (visitor && visitor.country) {
           const countryCode = this.getCountryCode(visitor.country);
           if (countryCode) {
             countryStats[countryCode] = (countryStats[countryCode] || 0) + 1;
             totalVisitors++;
           }
         }
-      });
+      }
 
       console.log('Country stats:', countryStats, 'Total visitors:', totalVisitors);
 
       // 在地图上显示分布
-      Object.entries(countryStats).forEach(([countryCode, count]) => {
-        const element = this.svg?.querySelector(`[data-country="${countryCode}"]`);
+      for (const countryCode in countryStats) {
+        const count = countryStats[countryCode];
+        const element = this.svg && this.svg.querySelector('[data-country="' + countryCode + '"]');
         if (element) {
           element.classList.add('has-visitors');
           element.setAttribute('data-visitor-count', count);
           // 根据访问量设置不同的颜色深度
           const opacity = Math.min(count * 0.3 + 0.4, 1);
-          element.style.fill = `rgba(76, 175, 80, ${opacity})`;
-          console.log(`Set color for ${countryCode}: ${count} visitors, opacity: ${opacity}`);
+          element.style.fill = 'rgba(76, 175, 80, ' + opacity + ')';
+          console.log('Set color for ' + countryCode + ': ' + count + ' visitors, opacity: ' + opacity);
         }
-      });
+      }
       
       console.log('Visitor distribution display complete');
     } catch (error) {
