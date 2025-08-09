@@ -344,6 +344,9 @@ class AdvancedVisitorStats {
       this.stats.visitors = {};
     }
 
+    // 不使用可选链，兼容旧浏览器
+    var prev = this.stats.visitors[visitorId] ? this.stats.visitors[visitorId] : {};
+
     // 更新或创建访客记录
     this.stats.visitors[visitorId] = {
       ip: data.ip,
@@ -351,9 +354,9 @@ class AdvancedVisitorStats {
       region: data.region,
       country: data.country,
       countryCode: data.countryCode,
-      firstVisit: this.stats.visitors[visitorId]?.firstVisit || now,
+      firstVisit: prev.firstVisit ? prev.firstVisit : now,
       lastVisit: now,
-      visitCount: (this.stats.visitors[visitorId]?.visitCount || 0) + 1
+      visitCount: (prev.visitCount ? prev.visitCount : 0) + 1
     };
 
     this.saveStats();
@@ -425,21 +428,23 @@ class AdvancedVisitorStats {
     const recentThreshold = 30 * 60 * 1000; // 30分钟内算作在线
     const hour = new Date().getHours();
     
-    // 计算最近活跃的访客数量
-    const recentVisitors = Object.values(this.stats.visitors).filter(visitor => {
-      return (now - visitor.lastVisit) < recentThreshold;
-    }).length;
+    // 计算最近活跃的访客数量（避免使用 Object.values 以提高兼容性）
+    var recentVisitors = 0;
+    for (var vid in this.stats.visitors) {
+      if (!Object.prototype.hasOwnProperty.call(this.stats.visitors, vid)) continue;
+      var visitor = this.stats.visitors[vid];
+      if (visitor && (now - visitor.lastVisit) < recentThreshold) {
+        recentVisitors++;
+      }
+    }
 
     // 基于时间的基础倍数
-    let multiplier;
+    var multiplier;
     if (hour >= 9 && hour <= 18) {
-      // 工作时间：较高活跃度
       multiplier = 1.5 + Math.sin((hour - 9) / 9 * Math.PI) * 0.8;
     } else if (hour >= 19 && hour <= 23) {
-      // 晚上：中等活跃度
       multiplier = 1.2 + Math.sin((hour - 19) / 4 * Math.PI) * 0.5;
     } else {
-      // 深夜/凌晨：低活跃度
       multiplier = 0.3 + Math.random() * 0.4;
     }
 
@@ -449,10 +454,7 @@ class AdvancedVisitorStats {
       multiplier *= 0.8;
     }
 
-    // 计算估计在线数
-    let estimatedOnline = Math.max(1, Math.floor(recentVisitors * multiplier));
-    
-    // 如果没有近期访客，至少显示1-3人在线
+    var estimatedOnline = Math.max(1, Math.floor(recentVisitors * multiplier));
     if (recentVisitors === 0) {
       estimatedOnline = 1 + Math.floor(Math.random() * 3);
     }
