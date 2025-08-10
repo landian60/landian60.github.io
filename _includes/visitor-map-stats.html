@@ -895,7 +895,8 @@ class WorldMapVisitorStats {
       'Brazil': 'BR',
       'Russia': 'RU'
     };
-    return countryMap[countryName] || countryName?.substring(0, 2).toUpperCase();
+    // Replace optional chaining for compatibility
+    return countryMap[countryName] || (countryName ? countryName.substring(0, 2).toUpperCase() : '');
   }
 }
 
