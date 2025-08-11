@@ -291,122 +291,83 @@ class AdvancedVisitorStats {
 
     if (data.countryCode) {
       const flag = this.getCountryFlag(data.countryCode);
-      this.updateElement('location-text', `${flag} ${location}`);
+      this.updateElement('location-text', flag + ' ' + location);
     }
 
     // Save to local visitors index for map usage
     this.saveVisitorInfo(data);
 
+    // 刷新分布
+    this.updateDistributionDisplay();
+
     // Optionally report to external endpoint (if configured)
-    this.reportVisitor(data).catch(() => {/* noop */});
+    this.reportVisitor(data).catch(function(){ });
   }
 
-  // Report visitor to optional external endpoint (Google Apps Script / webhook etc.)
-  async reportVisitor(data) {
-    try {
-      const endpoint = (typeof window !== 'undefined' && window.VISITOR_API) ? window.VISITOR_API : '';
-      if (!endpoint) return; // silently skip if not configured
+  // 渲染国家分布列表（用于 Simple Stats 底部）
+  updateDistributionDisplay() {
+    var container = document.getElementById('location-distribution');
+    if (!container || !this.stats || !this.stats.visitors) return;
 
-      const payload = {
-        timestamp: Date.now(),
-        ip: data.ip || '',
-        countryCode: data.countryCode || '',
-        country: data.country || '',
-        region: data.region || '',
-        city: data.city || '',
-        timezone: data.timezone || '',
-        userAgent: navigator.userAgent,
-        referrer: document.referrer || '',
-      };
-
-      // POST JSON
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        // no-cors allows success without reading response on GAS default settings
-        mode: 'no-cors'
-      });
-    } catch (e) {
-      // Swallow errors to avoid impacting UX on GitHub Pages
-      console.warn('reportVisitor failed:', e);
-    }
-  }
-
-  // 保存访客信息
-  saveVisitorInfo(data) {
-    if (data.error || !data.ip) return;
-
-    const visitorId = this.generateVisitorId(data.ip);
-    const now = Date.now();
-    
-    if (!this.stats.visitors) {
-      this.stats.visitors = {};
+    // 汇总每个国家的访客数与最近时间
+    var counts = {}; // { code: { count, name, last } }
+    for (var vid in this.stats.visitors) {
+      if (!Object.prototype.hasOwnProperty.call(this.stats.visitors, vid)) continue;
+      var v = this.stats.visitors[vid];
+      if (!v) continue;
+      var code = (v.countryCode ? v.countryCode.toUpperCase() : (v.country ? v.country.substring(0,2).toUpperCase() : '')) || '';
+      if (!code) continue;
+      if (!counts[code]) counts[code] = { count: 0, name: v.country || code, last: 0 };
+      counts[code].count += 1;
+      if (v.lastVisit && v.lastVisit > counts[code].last) counts[code].last = v.lastVisit;
+      // 尽量保留更完整的名称
+      if (v.country && v.country.length > (counts[code].name||'').length) counts[code].name = v.country;
     }
 
-    // 不使用可选链，兼容旧浏览器
-    var prev = this.stats.visitors[visitorId] ? this.stats.visitors[visitorId] : {};
-
-    // 更新或创建访客记录
-    this.stats.visitors[visitorId] = {
-      ip: data.ip,
-      city: data.city,
-      region: data.region,
-      country: data.country,
-      countryCode: data.countryCode,
-      firstVisit: prev.firstVisit ? prev.firstVisit : now,
-      lastVisit: now,
-      visitCount: (prev.visitCount ? prev.visitCount : 0) + 1
-    };
-
-    this.saveStats();
-  }
-
-  // 生成访客ID（基于IP的哈希）
-  generateVisitorId(ip) {
-    let hash = 0;
-    for (let i = 0; i < ip.length; i++) {
-      const char = ip.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // 转换为32位整数
+    // 转为数组并排序
+    var arr = [];
+    for (var code2 in counts) {
+      if (!Object.prototype.hasOwnProperty.call(counts, code2)) continue;
+      arr.push({ code: code2, name: counts[code2].name || code2, count: counts[code2].count, last: counts[code2].last });
     }
-    return Math.abs(hash).toString(36);
-  }
+    arr.sort(function(a,b){ return b.count - a.count; });
 
-  // 获取国家旗帜emoji
-  getCountryFlag(countryCode) {
-    if (!countryCode || countryCode.length !== 2) return '';
-    
-    const flagMap = {
-      'CN': '🇨🇳', 'US': '🇺🇸', 'JP': '🇯🇵', 'KR': '🇰🇷', 
-      'GB': '🇬🇧', 'FR': '🇫🇷', 'DE': '🇩🇪', 'CA': '🇨🇦',
-      'AU': '🇦🇺', 'IN': '🇮🇳', 'BR': '🇧🇷', 'RU': '🇷🇺'
-    };
-    
-    return flagMap[countryCode.toUpperCase()] || '';
-  }
+    // 取前10
+    arr = arr.slice(0, 10);
 
-  // 掩码IP地址
-  maskIP(ip) {
-    if (!ip || ip === 'Unknown') return ip;
-    
-    if (ip.includes('.')) {
-      // IPv4
-      const parts = ip.split('.');
-      return `${parts[0]}.${parts[1]}.*.***`;
-    } else if (ip.includes(':')) {
-      // IPv6
-      const parts = ip.split(':');
-      return parts.slice(0, 3).join(':') + ':****';
+    // 生成HTML
+    var html = '';
+    for (var i=0;i<arr.length;i++) {
+      var item = arr[i];
+      var flag = this.getCountryFlag(item.code);
+      var timeAgo = this.getTimeAgoSimple(item.last);
+      html += '<li class="dist-item">' +
+              '<span class="dist-flag">' + flag + '</span>' +
+              '<span class="dist-name">' + item.name + ' (' + item.code + ')</span>' +
+              '<span class="dist-count">' + item.count + '</span>' +
+              (timeAgo ? '<span class="dist-time">' + timeAgo + '</span>' : '') +
+              '</li>';
     }
-    
-    return ip;
+
+    this.updateInnerHTML('location-distribution', html || '<li class="dist-empty">No location data yet</li>');
   }
 
-  // 格式化位置
-  formatLocation(data) {
-    const parts = [data.city, data.region, data.country].filter(Boolean);
-    return parts.length > 0 ? parts.join(', ') : 'Location unknown';
+  // 简单的相对时间
+  getTimeAgoSimple(ts) {
+    if (!ts) return '';
+    var diff = Date.now() - ts;
+    if (diff < 60000) return 'just now';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+    return Math.floor(diff/86400000) + 'd ago';
+  }
+
+  // 安全设置 innerHTML
+  updateInnerHTML(id, html) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.innerHTML = html;
+    }
   }
 
   // 更新所有显示
@@ -418,6 +379,9 @@ class AdvancedVisitorStats {
     this.updateElement('visitor-count', this.formatNumber(this.stats.totalVisits));
     this.updateElement('today-count', this.formatNumber(todayStats.visits));
     this.updateElement('online-count', onlineCount);
+
+    // 更新位置分布（Simple Stats下方列表）
+    this.updateDistributionDisplay();
   }
 
   // 计算在线用户数（基于真实访客数据的模拟算法）
