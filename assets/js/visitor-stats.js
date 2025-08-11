@@ -33,8 +33,9 @@ class AdvancedVisitorStats {
 
   async init() {
     try {
-      await this.loadStats();
+      this.loadStats();
       await this.updateVisitCounts();
+      this.updateDisplays();  // 先显示基本统计
       await this.fetchLocationData();
       this.startPeriodicUpdates();
       this.setupVisibilityHandler();
@@ -48,19 +49,8 @@ class AdvancedVisitorStats {
   loadStats() {
     try {
       const stored = localStorage.getItem(this.config.storageKey);
-      this.stats = stored ? JSON.parse(stored) : {
-        totalVisits: 0,
-        uniqueVisits: 0,
-        dailyStats: {},
-        weeklyStats: {},
-        monthlyStats: {},
-        visitors: {}, // 添加visitors对象用于存储访客信息
-        firstVisit: Date.now(),
-        lastVisit: null,
-        userAgent: navigator.userAgent,
-        referrer: document.referrer,
-        sessions: []
-      };
+      this.stats = stored ? JSON.parse(stored) : this.getDefaultStats();
+      console.log('Stats loaded:', this.stats);
     } catch (error) {
       console.warn('Failed to load stats data, using defaults:', error);
       this.stats = this.getDefaultStats();
@@ -307,7 +297,15 @@ class AdvancedVisitorStats {
   // 渲染国家分布列表（用于 Simple Stats 底部）
   updateDistributionDisplay() {
     var container = document.getElementById('location-distribution');
-    if (!container || !this.stats || !this.stats.visitors) return;
+    if (!container) {
+      console.warn('Location distribution container not found');
+      return;
+    }
+    
+    if (!this.stats || !this.stats.visitors) {
+      this.updateInnerHTML('location-distribution', '<li class="dist-empty">Collecting...</li>');
+      return;
+    }
 
     // 汇总每个国家的访客数与最近时间
     var counts = {}; // { code: { count, name, last } }
@@ -337,19 +335,23 @@ class AdvancedVisitorStats {
 
     // 生成HTML
     var html = '';
-    for (var i=0;i<arr.length;i++) {
-      var item = arr[i];
-      var flag = this.getCountryFlag(item.code);
-      var timeAgo = this.getTimeAgoSimple(item.last);
-      html += '<li class="dist-item">' +
-              '<span class="dist-flag">' + flag + '</span>' +
-              '<span class="dist-name">' + item.name + ' (' + item.code + ')</span>' +
-              '<span class="dist-count">' + item.count + '</span>' +
-              (timeAgo ? '<span class="dist-time">' + timeAgo + '</span>' : '') +
-              '</li>';
+    if (arr.length === 0) {
+      html = '<li class="dist-empty">No location data yet</li>';
+    } else {
+      for (var i=0;i<arr.length;i++) {
+        var item = arr[i];
+        var flag = this.getCountryFlag(item.code);
+        var timeAgo = this.getTimeAgoSimple(item.last);
+        html += '<li class="dist-item">' +
+                '<span class="dist-flag">' + flag + '</span>' +
+                '<span class="dist-name">' + item.name + ' (' + item.code + ')</span>' +
+                '<span class="dist-count">' + item.count + '</span>' +
+                (timeAgo ? '<span class="dist-time">' + timeAgo + '</span>' : '') +
+                '</li>';
+      }
     }
 
-    this.updateInnerHTML('location-distribution', html || '<li class="dist-empty">No location data yet</li>');
+    this.updateInnerHTML('location-distribution', html);
   }
 
   // 简单的相对时间
@@ -372,6 +374,12 @@ class AdvancedVisitorStats {
 
   // 更新所有显示
   updateDisplays() {
+    // 确保 stats 已初始化
+    if (!this.stats) {
+      console.warn('Stats not initialized yet, skipping update');
+      return;
+    }
+
     const today = this.getDateKey(Date.now());
     const todayStats = this.stats.dailyStats[today] || { visits: 0 };
     const onlineCount = this.calculateOnlineUsers();
@@ -494,9 +502,10 @@ class AdvancedVisitorStats {
 
   // 显示错误
   showError() {
-    this.updateElement('visitor-count', 'Failed', 'error-text');
-    this.updateElement('today-count', 'Failed', 'error-text');
-    this.updateElement('online-count', 'Failed', 'error-text');
+    this.updateElement('visitor-count', 'Error', 'error-text');
+    this.updateElement('today-count', 'Error', 'error-text');
+    this.updateElement('online-count', 'Error', 'error-text');
+    this.updateInnerHTML('location-distribution', '<li class="dist-empty">Error loading data</li>');
   }
 
   // 工具方法
