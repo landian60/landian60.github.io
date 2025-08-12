@@ -37,7 +37,12 @@ class AdvancedVisitorStats {
       await this.updateVisitCounts();
       await this.fetchLocationData();
       this.updateCurrentTime(); // 立即更新时间
-      this.updateTopLocations(); // 初始化Top Locations
+      
+      // 延迟更新Top Locations，确保DOM元素已加载
+      setTimeout(() => {
+        this.updateTopLocations();
+      }, 500);
+      
       this.startPeriodicUpdates();
       this.setupVisibilityHandler();
     } catch (error) {
@@ -345,9 +350,16 @@ class AdvancedVisitorStats {
     const todayStats = this.stats.dailyStats[today] || { visits: 0 };
     const onlineCount = this.calculateOnlineUsers();
 
+    console.log('Updating displays - Total:', this.stats.totalVisits, 'Today:', todayStats.visits, 'Online:', onlineCount);
+
     this.updateElement('visitor-count', this.formatNumber(this.stats.totalVisits));
     this.updateElement('today-count', this.formatNumber(todayStats.visits));
     this.updateElement('online-count', onlineCount);
+    
+    // 更新移动端显示
+    this.updateElement('mobile-visitor-count', this.formatNumber(this.stats.totalVisits));
+    this.updateElement('mobile-today-count', this.formatNumber(todayStats.visits));
+    this.updateElement('mobile-online-count', onlineCount);
     
     // 更新当前时间
     this.updateCurrentTime();
@@ -393,7 +405,11 @@ class AdvancedVisitorStats {
       
       // 保存数据并更新显示
       this.saveStats();
-      this.updateTopLocations();
+      
+      // 延迟更新Top Locations
+      setTimeout(() => {
+        this.updateTopLocations();
+      }, 200);
     }
   }
 
@@ -419,7 +435,10 @@ class AdvancedVisitorStats {
   // 更新Top Locations显示
   updateTopLocations() {
     const listElement = document.getElementById('top-locations-list');
-    if (!listElement) return;
+    if (!listElement) {
+      console.warn('Top locations list element not found');
+      return;
+    }
 
     if (!this.stats.visitors || Object.keys(this.stats.visitors).length === 0) {
       listElement.innerHTML = '<div class="loading-indicator">No visitor data yet</div>';
@@ -464,6 +483,7 @@ class AdvancedVisitorStats {
     `).join('');
 
     listElement.innerHTML = html;
+    console.log('Top locations updated with', topLocations.length, 'locations');
   }
 
   // 计算在线用户数（模拟算法）
@@ -489,7 +509,9 @@ class AdvancedVisitorStats {
     // 添加随机因素
     const randomFactor = Math.floor(Math.random() * 3) - 1;
     
-    return Math.max(1, baseCount + randomFactor);
+    const result = Math.max(1, baseCount + randomFactor);
+    console.log('Calculated online users:', result, 'hour:', hour, 'day:', dayOfWeek);
+    return result;
   }
 
   // 更新元素
