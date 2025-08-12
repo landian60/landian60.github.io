@@ -48,16 +48,15 @@
         </div>
       </div>
     </div>
-
-    <!-- 新增：国家/地区分布列表（简版） -->
-    <div class="distribution">
-      <div class="dist-title">
-        <i class="fas fa-flag"></i>
+    
+    <div class="top-locations">
+      <div class="top-locations-header">
+        <i class="fas fa-chart-pie"></i>
         <span>Top Locations (last 3 months)</span>
       </div>
-      <ul id="location-distribution" class="dist-list">
-        <li class="dist-empty">Collecting...</li>
-      </ul>
+      <div id="top-locations-list" class="locations-list">
+        <div class="loading-indicator">Collecting...</div>
+      </div>
     </div>
   </div>
 </div>
@@ -66,6 +65,16 @@
 .visitor-stats-container {
   margin: 30px 0 20px 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.visitor-stats-box {
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+  font-size: 14px;
 }
 
 .visitor-stats-box {
@@ -176,38 +185,63 @@
   font-size: 11px;
 }
 
-/* 分布列表样式（低权重、低存在感） */
-.distribution {
+/* Top Locations 样式 */
+.top-locations {
+  margin-top: 15px;
+  padding-top: 12px;
   border-top: 1px solid #e9ecef;
-  margin-top: 10px;
-  padding-top: 10px;
 }
-.dist-title {
+
+.top-locations-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.locations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.location-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: rgba(108, 117, 125, 0.05);
+  border-radius: 4px;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.location-item:hover {
+  background: rgba(108, 117, 125, 0.1);
+}
+
+.location-name {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: #495057;
+}
+
+.location-count {
+  font-weight: 500;
+  color: #007bff;
+}
+
+.loading-indicator {
+  text-align: center;
   color: #6c757d;
   font-size: 12px;
-  margin-bottom: 6px;
+  font-style: italic;
+  padding: 10px;
 }
-.dist-title .fas { font-size: 12px; }
-.dist-list { list-style: none; margin: 0; padding: 0; }
-.dist-item {
-  display: grid;
-  grid-template-columns: 24px 1fr auto auto;
-  gap: 8px;
-  align-items: center;
-  font-size: 12px;
-  color: #6c757d;
-  padding: 4px 0;
-  border-bottom: 1px dashed #f1f3f5;
-}
-.dist-item:last-child { border-bottom: none; }
-.dist-flag { width: 24px; text-align: center; }
-.dist-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dist-count { color: #495057; font-weight: 600; min-width: 20px; text-align: right; }
-.dist-time { color: #adb5bd; font-size: 11px; min-width: 60px; text-align: right; }
-.dist-empty { color: #adb5bd; font-style: italic; font-size: 12px; padding: 4px 0; }
 
 @media (max-width: 768px) {
   .visitor-stats-box {
@@ -316,6 +350,8 @@
   100% { transform: scale(1); }
 }
 </style>
+
+<script src="{{ base_path }}/assets/js/visitor-stats.js"></script>
 
 <script>
 // 补充功能和实时时间显示

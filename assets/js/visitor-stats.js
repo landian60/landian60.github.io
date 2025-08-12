@@ -37,6 +37,7 @@ class AdvancedVisitorStats {
       await this.updateVisitCounts();
       await this.fetchLocationData();
       this.updateCurrentTime(); // 立即更新时间
+      this.updateTopLocations(); // 初始化Top Locations
       this.startPeriodicUpdates();
       this.setupVisibilityHandler();
     } catch (error) {
@@ -59,7 +60,8 @@ class AdvancedVisitorStats {
         lastVisit: null,
         userAgent: navigator.userAgent,
         referrer: document.referrer,
-        sessions: []
+        sessions: [],
+        visitors: {} // 存储访客位置信息
       };
     } catch (error) {
       console.warn('Failed to load stats data, using defaults:', error);
@@ -79,7 +81,8 @@ class AdvancedVisitorStats {
       lastVisit: null,
       userAgent: navigator.userAgent,
       referrer: document.referrer,
-      sessions: []
+      sessions: [],
+      visitors: {} // 存储访客位置信息
     };
   }
 
@@ -295,6 +298,9 @@ class AdvancedVisitorStats {
       const flag = this.getCountryFlag(data.countryCode);
       this.updateElement('location-text', `${flag} ${location}`);
     }
+
+    // 保存访客位置信息用于Top Locations
+    this.saveVisitorLocation(data);
   }
 
   // 获取国家旗帜emoji
@@ -352,6 +358,112 @@ class AdvancedVisitorStats {
     const now = new Date();
     const timeString = now.toLocaleTimeString();
     this.updateElement('current-time', timeString);
+  }
+
+  // 保存访客位置信息
+  saveVisitorLocation(data) {
+    if (!data.country || data.error) return;
+
+    const now = Date.now();
+    const visitorId = this.generateVisitorId(data);
+    
+    // 只保存最近3个月的数据
+    const threeMonthsAgo = now - (90 * 24 * 60 * 60 * 1000);
+    
+    if (!this.stats.visitors) {
+      this.stats.visitors = {};
+    }
+
+    // 检查是否是新的访客位置记录
+    const existingVisitor = this.stats.visitors[visitorId];
+    if (!existingVisitor || (now - existingVisitor.lastVisit) > (4 * 60 * 60 * 1000)) {
+      this.stats.visitors[visitorId] = {
+        country: data.country,
+        city: data.city,
+        region: data.region,
+        countryCode: data.countryCode,
+        flag: this.getCountryFlag(data.countryCode),
+        firstVisit: existingVisitor ? existingVisitor.firstVisit : now,
+        lastVisit: now,
+        visits: (existingVisitor ? existingVisitor.visits : 0) + 1
+      };
+
+      // 清理旧数据
+      this.cleanOldVisitorData(threeMonthsAgo);
+      
+      // 保存数据并更新显示
+      this.saveStats();
+      this.updateTopLocations();
+    }
+  }
+
+  // 生成访客ID
+  generateVisitorId(data) {
+    // 基于IP和用户代理生成简单ID
+    const identifier = (data.ip || 'unknown') + '_' + (data.country || 'unknown');
+    return btoa(identifier).replace(/[+=\/]/g, '').substring(0, 12);
+  }
+
+  // 清理旧的访客数据
+  cleanOldVisitorData(cutoffTime) {
+    if (!this.stats.visitors) return;
+
+    Object.keys(this.stats.visitors).forEach(visitorId => {
+      const visitor = this.stats.visitors[visitorId];
+      if (visitor.lastVisit < cutoffTime) {
+        delete this.stats.visitors[visitorId];
+      }
+    });
+  }
+
+  // 更新Top Locations显示
+  updateTopLocations() {
+    const listElement = document.getElementById('top-locations-list');
+    if (!listElement) return;
+
+    if (!this.stats.visitors || Object.keys(this.stats.visitors).length === 0) {
+      listElement.innerHTML = '<div class="loading-indicator">No visitor data yet</div>';
+      return;
+    }
+
+    // 统计每个位置的访问次数
+    const locationStats = {};
+    Object.values(this.stats.visitors).forEach(visitor => {
+      const locationKey = visitor.country;
+      if (locationKey) {
+        if (!locationStats[locationKey]) {
+          locationStats[locationKey] = {
+            name: locationKey,
+            flag: visitor.flag,
+            count: 0
+          };
+        }
+        locationStats[locationKey].count += visitor.visits;
+      }
+    });
+
+    // 排序并取前5名
+    const topLocations = Object.values(locationStats)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    if (topLocations.length === 0) {
+      listElement.innerHTML = '<div class="loading-indicator">No data available</div>';
+      return;
+    }
+
+    // 生成HTML
+    const html = topLocations.map(location => `
+      <div class="location-item">
+        <div class="location-name">
+          <span>${location.flag}</span>
+          <span>${location.name}</span>
+        </div>
+        <div class="location-count">${location.count}</div>
+      </div>
+    `).join('');
+
+    listElement.innerHTML = html;
   }
 
   // 计算在线用户数（模拟算法）
