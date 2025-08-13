@@ -1,34 +1,15 @@
-<!-- 访客统计组件 -->
+<!-- 简化的访客统计组件 -->
 <div id="visitor-stats" class="visitor-stats-container">
   <div class="visitor-stats-box">
     <div class="stats-header">
       <i class="fas fa-chart-line"></i>
       <span>Visitor Statistics</span>
-      <div class="stats-refresh" onclick="window.visitorStats && window.visitorStats.fetchLocationData()" title="Refresh location info">
-        <i class="fas fa-sync-alt"></i>
-      </div>
     </div>
     
     <div class="stats-content">
       <div class="stat-item">
-        <div class="stat-value" id="visitor-count">
-          <i class="fas fa-spinner fa-spin"></i>
-        </div>
+        <div class="stat-value" id="visitor-count">0</div>
         <div class="stat-label">Total Visits</div>
-      </div>
-      
-      <div class="stat-item">
-        <div class="stat-value" id="today-count">
-          <i class="fas fa-spinner fa-spin"></i>
-        </div>
-        <div class="stat-label">Today</div>
-      </div>
-      
-      <div class="stat-item">
-        <div class="stat-value" id="online-count">
-          <i class="fas fa-spinner fa-spin"></i>
-        </div>
-        <div class="stat-label">Online</div>
       </div>
     </div>
     

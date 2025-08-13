@@ -1,28 +1,12 @@
-<!-- 移动端友好的访客统计组件 -->
+<!-- 移动端简化的访客统计组件 -->
 <div id="mobile-visitor-stats" class="mobile-stats-container">
   <div class="mobile-stats-box">
     <div class="mobile-stats-grid">
       <div class="mobile-stat-item">
         <span class="mobile-stat-icon">👥</span>
         <div class="mobile-stat-content">
-          <div class="mobile-stat-value" id="mobile-visitor-count">...</div>
-          <div class="mobile-stat-label">Visits</div>
-        </div>
-      </div>
-      
-      <div class="mobile-stat-item">
-        <span class="mobile-stat-icon">📅</span>
-        <div class="mobile-stat-content">
-          <div class="mobile-stat-value" id="mobile-today-count">...</div>
-          <div class="mobile-stat-label">Today</div>
-        </div>
-      </div>
-      
-      <div class="mobile-stat-item">
-        <span class="mobile-stat-icon">🌐</span>
-        <div class="mobile-stat-content">
-          <div class="mobile-stat-value" id="mobile-online-count">...</div>
-          <div class="mobile-stat-label">Online</div>
+          <div class="mobile-stat-value" id="mobile-visitor-count">0</div>
+          <div class="mobile-stat-label">Total Visits</div>
         </div>
       </div>
     </div>
@@ -211,13 +195,11 @@
     // 更新移动端显示
     updateMobileDisplay() {
       try {
-        // 获取桌面版的数据（移除可选链，避免语法错误）
-        var el;
-        const visitorCount = ((el = document.getElementById('visitor-count')) && el.textContent) ? el.textContent : '...';
-        const todayCount = ((el = document.getElementById('today-count')) && el.textContent) ? el.textContent : '...';
-        const onlineCount = ((el = document.getElementById('online-count')) && el.textContent) ? el.textContent : '...';
-        const locEl = document.getElementById('location-text');
-        const locationText = (locEl && locEl.textContent) ? locEl.textContent : '获取位置中...';
+        // 获取桌面版的数据
+        const visitorCount = document.getElementById('visitor-count')?.textContent || '...';
+        const todayCount = document.getElementById('today-count')?.textContent || '...';
+        const onlineCount = document.getElementById('online-count')?.textContent || '...';
+        const locationText = document.getElementById('location-text')?.textContent || '获取位置中...';
 
         // 更新移动端显示
         this.updateElement('mobile-visitor-count', visitorCount);
