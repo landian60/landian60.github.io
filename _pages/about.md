@@ -19,4 +19,4 @@ News
 * I have developed a deepfake detection method of image generation based on CLIP and frequency analysis.
 * Ramping up for my TOEFL bout! 🚀📚💪
 
-<script type="text/javascript" id="clustrmaps" src="//clustrmaps.com/map_v2.js?d=DyuLz6t9ZyGphOCKp6E4iftO_XSFEjgx04lzQNQNzUQ&cl=ffffff&w=a"></script>
+{% include clustrmaps.html %}
