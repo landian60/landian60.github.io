@@ -26,7 +26,8 @@ permalink: /stats-test/
     </button>
   </div>
 
-  {% include visitor-stats-switcher.html %}
+  {% include visitor-stats.html %}
+  {% include mobile-visitor-stats.html %}
   
   <div style="background: #e9ecef; padding: 15px; border-radius: 6px; margin-top: 20px;">
     <h4>How to Test Accumulation:</h4>
