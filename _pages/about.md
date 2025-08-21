@@ -7,7 +7,7 @@ redirect_from:
   - /about.html
 ---
 
-Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Generative Models**, particularly in the topic of Context-aware Personalization, Reasoning LLMs, GAN/Diffusion, Multi-modal Learning and Neural Representation.
+Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Generative Models** (Reasoning LLMs, GAN/Diffusion and Neural Representation) and **Multimodal Learning** (Context-aware Personalization, Model Evaluation, HCI).
 
 News
 ======
