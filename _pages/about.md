@@ -7,11 +7,11 @@ redirect_from:
   - /about.html
 ---
 
-Greetings! My name is Guanming Liu, a master student from **Tongji University**, majoring in computer science and technology. My research interests primarily focus on **Generative Models** (Reasoning LLMs, GAN/Diffusion and Neural Representation) and **Multimodal Learning** (Context-aware Personalization, Model Evaluation, HCI).
+Greetings! My name is Guanming Liu, a PhD candidate from **Fudan University**, majoring in computer science and technology. My research interests primarily focus on **Generative Models** (RLHF, LLM Agents, GAN/Diffusion, Neural Representation) and Human-centered Learning (Personalization, Human-AI Interaction, Multi-modal Evaluation)
 
 News
 ======
-* Paper "IntPro: Building a Small Reasoning Proxy Model for Context-aware Intent Understanding" is under submission.
+* Paper " IntPro: A Context-Aware Proxy Agent via Retrieval-Conditioned Inference for Personalized Intent Understanding" is under submission.
 * Master's degree in hand!
 * Paper "Controlling Attention Map Better for Text-Guided Image Editing Diffusion Models" is **accepted** by ICIC 2024. 
 * Paper "VL-MPFT: Multitask Parameter-Efficient Fine-Tuning for Visual-Language Pre-trained Models via Task-adaptive Masking" is **accepted** by PRCV 2024. 

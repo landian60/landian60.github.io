@@ -20,6 +20,7 @@ redirect_from:
 
 *EDUCATION*
 ======
+* Ph.D. in Shanghai, **Fudan University**, 2024-2028
 * M.S. in Shanghai, **Tongji University** (recommended for admission), 2021-2024
 * B.S. in Nanjing, **Hohai University**, 2017-2021
 
@@ -29,6 +30,9 @@ redirect_from:
 * September 2022 - September 2023: Research Intern
   * Ele.me, Alibaba Group
   * Study on multi-modal image generation and image editing
+
+* September 2024 – Present: Ph.D. Student
+  * Collaborative Information and Systems Laboratory, Fudan University
 
 * September 2021 – May 2024: Postgraduate Student
   * Intelligence Information Processing Laboratory, Tongji University
